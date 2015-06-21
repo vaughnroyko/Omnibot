@@ -1,2 +1,4 @@
 outputBotMessagesToConsole: true
 defaultListSize: 3
+output:
+    leaving: '#REKT'
