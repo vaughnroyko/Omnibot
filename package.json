@@ -1,0 +1,16 @@
+{
+    "name": "DrathyBot",
+    "version": "0.2.0",
+    "description": "A custom Node.js/twitch-irc bot.",
+    "main": "lib/bot.js",
+    "repository": "https://github.com/vaughnroyko/DrathybotAlpha",
+    "dependencies": {
+        "chalk": "*",
+        "twitch-irc": "*",
+        "twitch-irc-api": "*",
+        "request": "*",
+        "mongoose": "*",
+        "season": "*",
+        "underscore-plus": "*"
+    }
+}

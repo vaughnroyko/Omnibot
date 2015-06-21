@@ -1,0 +1,12 @@
+outputBotMessagesToConsole: true
+defaultListSize: 3
+
+points:
+    enabled: true
+    startWith: 5
+    perMinute: 1
+
+modsCanRunBroadcasterCommands: true
+
+# channel name is included by default
+keywords: []

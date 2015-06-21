@@ -1,0 +1,8 @@
+options:
+    debug: true
+    debugIgnore: ['ping', 'chat', 'join', 'part']
+    tc: 1
+identity:
+    username: ''
+    password: 'oauth:'
+channels: ['']
