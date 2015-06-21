@@ -9,6 +9,7 @@
         "twitch-irc": "*",
         "twitch-irc-api": "*",
         "request": "*",
-        "mongoose": "*"
+        "mongoose": "*",
+        "season": "*"
     }
 }
