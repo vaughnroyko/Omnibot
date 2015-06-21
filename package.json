@@ -10,6 +10,7 @@
         "twitch-irc-api": "*",
         "request": "*",
         "mongoose": "*",
-        "season": "*"
+        "season": "*",
+        "underscore-plus": "*"
     }
 }

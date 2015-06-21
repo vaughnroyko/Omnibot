@@ -1,4 +1,34 @@
 outputBotMessagesToConsole: true
 defaultListSize: 3
+
 output:
     leaving: '#REKT'
+
+points:
+    enabled: true
+    startWith: 5
+    perMinute: 1
+
+styles:
+    bot: 'grey.bold'
+    event:
+        join: 'cyan.bold'
+        leave: 'grey'
+
+    user: 'white'
+    moderator: '#user'
+    broadcaster: '#user'
+    points: 'green.bold'
+    greeting: 'magenta.bold.underline'
+    farewell: '#greeting'
+    keyword: 'yellow.bold.underline'
+
+    console:
+        info: 'grey'
+        error: 'red.bold'
+
+
+modsCanRunBroadcasterCommands: true
+
+# channel name is included
+keywords: []
