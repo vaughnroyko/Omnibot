@@ -1,10 +1,24 @@
+timestamp:
+    enabled: true
+    # {0} = hour
+    # {1} = hour 1-12
+    # {2} = minute
+    # {3} = second
+    # {4} = a/p
+    format: "{0}:{2}:{3}"
+
 outputBotMessagesToConsole: true
 defaultListSize: 3
+
+commandPrefix: "!"
 
 points:
     enabled: true
     startWith: 5
     perMinute: 1
+
+customCommands:
+    enabled: true
 
 modsCanRunBroadcasterCommands: true
 
