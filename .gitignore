@@ -1,2 +1,4 @@
 node_modules
 database
+run.bat
+options/twitch.cson
