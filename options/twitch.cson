@@ -1,5 +1,5 @@
 options:
-    debug: true
+    debug: false
     debugIgnore: ['ping', 'chat', 'join', 'part']
     tc: 1
 identity:
