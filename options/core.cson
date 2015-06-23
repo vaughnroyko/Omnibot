@@ -12,13 +12,19 @@ defaultListSize: 3
 
 commandPrefix: "!"
 
-points:
-    enabled: true
-    startWith: 5
-    perMinute: 1
+logCommandCalls: true
 
-customCommands:
-    enabled: true
+modules:
+    points:
+        enabled: true
+        startWith: 5
+        perMinute: 1
+
+    customCommands:
+        enabled: true
+
+    quotes:
+        enabled: true
 
 modsCanRunBroadcasterCommands: true
 

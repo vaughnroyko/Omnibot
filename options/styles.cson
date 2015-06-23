@@ -2,6 +2,7 @@ bot: 'grey.bold'
 event:
     join: 'cyan.bold'
     leave: 'grey'
+    command: 'grey.bold'
 
 user: 'white'
 moderator: '#user'
