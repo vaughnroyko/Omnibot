@@ -2,16 +2,18 @@ call npm install
 
 @echo off
 
-@echo if "%%~1"=="-FIXED_CTRL_C" ( > run.bat
-@echo    shift >> run.bat
-@echo ) else ( >> run.bat
-@echo    call ^<NUL %%0 -FIXED_CTRL_C %%* >> run.bat
-@echo    goto :EOF >> run.bat
-@echo ) >> run.bat
-@echo cd database >> run.bat
-@echo start /WAIT restart.bat >> run.bat
-@echo cd .. >> run.bat
-@echo start "Drathybot" node ../DrathybotAlpha >> run.bat
+@echo if "%%~1"=="-FIXED_CTRL_C" ( > s.bat
+@echo    shift >> s.bat
+@echo ) else ( >> s.bat
+@echo    call ^<NUL %%0 -FIXED_CTRL_C %%* >> s.bat
+@echo    goto :EOF >> s.bat
+@echo ) >> s.bat
+@echo cd database >> s.bat
+@echo i.vbs "start /WAIT restart.bat" >> s.bat
+@echo cd .. >> s.bat
+@echo start "Drathybot" node ../DrathybotAlpha >> s.bat
+
+@echo CreateObject("Wscript.Shell").Run "s.bat", 0, True > Drathybot.vbs
 
 mkdir database
 cd database
