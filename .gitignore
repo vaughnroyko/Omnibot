@@ -7,3 +7,4 @@ bot.log
 logs
 options/*
 !options/defaults/
+*.log
