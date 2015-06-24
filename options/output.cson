@@ -3,3 +3,23 @@ distributeSuccess: "A generous user has donated a total of {0} points to {1} use
 stealSuccess: "The tax collector has arrived! A total of {0} points was taxed from {1} users!"
 notLive: "{0} is not live!"
 streamTime: "{0} has been streaming for {1} hours and {2} minutes."
+
+messages:
+    # {0} = timestamp
+    # {1} = user
+    # {2} = message
+    format: "{0} {1}: {2}"
+    showCommandCalls: true
+    showBotChatMessagesInConsole: true
+    timestamp:
+        # {0} = hour
+        # {1} = hour 1-12
+        # {2} = minute
+        # {3} = second
+        # {4} = a/p
+        format: "{0}:{2}:{3}"
+        am: "AM"
+        pm: "PM"
+
+    defaultListSize: 3
+    maxListSize: 10
