@@ -11,6 +11,7 @@
         "request": "*",
         "mongoose": "*",
         "season": "*",
-        "underscore-plus": "*"
+        "underscore-plus": "*",
+        "fs-extra": "*"
     }
 }

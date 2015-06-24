@@ -1,8 +1,9 @@
 node_modules
 database
 run.bat
-options/twitch.cson
 Drathybot.vbs
 s.bat
 bot.log
 logs
+options/*
+!options/defaults/

@@ -1,0 +1,20 @@
+commandPrefix: "!"
+
+logChats: true
+
+modules:
+    points:
+        enabled: true
+        startWith: 5
+        perMinute: 1
+
+    customCommands:
+        enabled: true
+
+    quotes:
+        enabled: true
+
+modsCanRunBroadcasterCommands: true
+
+# channel name is included by default
+keywords: []
