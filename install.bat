@@ -11,7 +11,7 @@ call npm install
 @echo cd database >> s.bat
 @echo i.vbs "start /WAIT restart.bat" >> s.bat
 @echo cd .. >> s.bat
-@echo start "Drathybot" node ../DrathybotAlpha >> s.bat
+@echo start "Drathybot" node %~dp0 >> s.bat
 
 @echo CreateObject("Wscript.Shell").Run "s.bat", 0, True > Drathybot.vbs
 
