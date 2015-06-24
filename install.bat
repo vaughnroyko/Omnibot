@@ -21,9 +21,9 @@ cd database
 @echo CreateObject("Wscript.Shell").Run "" ^& WScript.Arguments(0) ^& "", 0, False > i.vbs
 
 @echo del db.log > start.bat
-@echo mongod --dbpath %%~dp0 --logpath db.log >> start.bat
+@echo "C:/Program Files/MongoDB/Server/3.0/bin/mongod.exe" --dbpath %%~dp0 --logpath db.log >> start.bat
 
-@echo mongo localhost:27017 --eval "db.adminCommand({shutdown : 1})" > stop.bat
+@echo "C:/Program Files/MongoDB/Server/3.0/bin/mongo.exe" localhost:27017 --eval "db.adminCommand({shutdown : 1})" > stop.bat
 
 @echo call stop.bat > restart.bat
 @echo timeout 1 >> restart.bat
