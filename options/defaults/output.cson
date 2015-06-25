@@ -17,7 +17,7 @@ messages:
         # {2} = minute
         # {3} = second
         # {4} = a/p
-        format: "{0}:{2}:{3}"
+        format: "{1}:{2}:{3}{4}"
         am: "AM"
         pm: "PM"
 
