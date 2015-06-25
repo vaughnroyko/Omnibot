@@ -2,18 +2,21 @@
 WIP version of Drathybot, a custom Node.js/twitch-irc bot.
 
 ## Using Drathybot
+
+### Prerequisites
+- [Node.js](https://nodejs.org)
+- [MongoDB](https://www.mongodb.org)
+
 ### Installation
-1. Install the necessary programs:
-  - [Node.js](https://nodejs.org)
-  - [MongoDB](https://www.mongodb.org)
-2. Run `install.bat`.
+##### Windows
+1. Run `install.bat`.
   - The installer should ask you for the path of MongoDB. If you installed to `C:/Program Files/MongoDB` then you can just hit enter. If else, you need to give it the path of the .exe files. Example: `path/to/MongoDB/Server/3.0/bin`
     - To change the path of MongoDB later, you can edit the file `DrathybotAlpha/database/mongo.loc`
-3. Edit `options/twitch.cson`:
+2. Edit `options/twitch.cson`:
   - Replace `identity.username` with the username of your bot.
   - Replace `identity.password` with your bot's [oauth key](http://www.twitchapps.com/tmi/).
   - Add your channel name to the `channels` array.
-4. To start the bot, run `Drathybot.vbs`
+3. To start the bot, run `Drathybot.vbs`
 
 ### Use
 - Drathybot accepts no commands from the console, but you can use `Ctrl`+`C` to close it.
