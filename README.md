@@ -22,7 +22,8 @@ WIP version of Drathybot, a custom Node.js/twitch-irc bot.
   - Shuts off the bot. Normal viewers can't use this command.
 - `!uptime`:
   - Says how long the stream has been live for.
-
+- `!time <user=[executor]>`:
+  - Says how many minutes the viewer has logged.
 - Points:
   - Points are the loyalty system of Drathybot. By being in the chat while the stream is live, you earn points.
   - `!balance <user=[executor]>`:
