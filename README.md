@@ -7,6 +7,7 @@ WIP version of Drathybot, a custom Node.js/twitch-irc bot.
   - [Node.js](https://nodejs.org)
   - [MongoDB](https://www.mongodb.org)
 2. Run `install.bat`.
+  - The installer should ask you for the path of MongoDB. If you installed to `C:/Program Files/MongoDB` then you can just hit enter. If else, you need to give it the path of the .exe files. Example: `path/to/MongoDB/Server/3.0/bin`
 3. Edit `options/twitch.cson`:
   - Replace `identity.username` with the username of your bot.
   - Replace `identity.password` with your bot's [oauth key](http://www.twitchapps.com/tmi/).
