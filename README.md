@@ -59,3 +59,9 @@ WIP version of Drathybot, a custom Node.js/twitch-irc bot.
   - `!command rank <name> <rank>`:
     - Change the rank of a command.
     - Rank can be `new`, `viewer`, `mod`, `admin`
+
+### Links
+  - To see what we're up to, our [Trello](https://trello.com/b/zUJNkwOP/drathybot)
+  - Check out our streams:
+    - [Drathy](http://www.twitch.tv/drathy)
+    - [Aari](http://www.twitch.tv/aaritak)
