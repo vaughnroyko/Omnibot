@@ -9,6 +9,9 @@ timeout 2 > NUL
 echo You can press [Enter] if that is your path.
 timeout 2 > NUL
 
+mkdir database
+cd database
+
 setlocal
 :askMongoFolder
 set /p loc="Please enter the path of MongoDB's executable containing folder: "
@@ -37,9 +40,6 @@ echo cd .. >> s.bat
 echo start "Drathybot" node %~dp0 >> s.bat
 
 echo CreateObject("Wscript.Shell").Run "s.bat", 0, True > Drathybot.vbs
-
-mkdir database
-cd database
 
 echo CreateObject("Wscript.Shell").Run "" ^& WScript.Arguments(0) ^& "", 0, False > i.vbs
 
