@@ -10,6 +10,7 @@ echo You can press [Enter] if that is your path.
 timeout 2 > NUL
 
 mkdir database
+cd database
 
 setlocal
 :askMongoFolder
@@ -39,8 +40,6 @@ echo cd .. >> s.bat
 echo start "Omnibot" node %%~dp0 >> s.bat
 
 echo CreateObject("Wscript.Shell").Run "s.bat", 0, True > Omnibot.vbs
-
-cd database
 
 echo CreateObject("Wscript.Shell").Run "" ^& WScript.Arguments(0) ^& "", 0, False > i.vbs
 
