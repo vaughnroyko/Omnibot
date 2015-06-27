@@ -6,8 +6,7 @@
     "repository": "https://github.com/vaughnroyko/DrathybotAlpha",
     "dependencies": {
         "chalk": "*",
-        "twitch-irc": "*",
-        "twitch-irc-api": "*",
+        "tmi.js": "*",
         "request": "*",
         "mongoose": "*",
         "season": "*",
