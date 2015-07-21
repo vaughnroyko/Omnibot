@@ -10,6 +10,7 @@ messages:
     # {1} = user
     # {2} = message
     format: "{0} {1}: {2}"
+    noUser: "{0} {2}"
     showCommandCalls: true
     showBotChatMessagesInConsole: true
     timestamp:
