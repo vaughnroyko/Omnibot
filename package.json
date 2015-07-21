@@ -8,9 +8,11 @@
         "chalk": "*",
         "tmi.js": "*",
         "request": "*",
-        "mongoose": "*",
+        "mongoose": ">=3.8.1",
         "season": "*",
         "underscore-plus": "*",
-        "fs-extra": "*"
+        "fs-extra": "*",
+        "deasync": "*",
+        "circular-json": "*"
     }
 }

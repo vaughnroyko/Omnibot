@@ -1,3 +1,5 @@
+exitOnException: true
+
 prefixes:
     basic: "!"
     mod: "^"
