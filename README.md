@@ -1,7 +1,11 @@
-# DrathybotAlpha
-WIP version of Drathybot, a custom Node.js/twitch-irc bot.
+# Omnibot
+A highly configurable twitch chat bot made with Node.js & tmi.js.
 
-## Using Drathybot
+# WARNING!!!
+## Use at your own risk!
+The current versions of Omnibot are very unstable as we change the API very frequently (and also break things pretty often). We're not responsible for any harm this version may cause. To you, your computer, or your twitch chat. Thanks. <3
+
+## Using Omnibot
 
 ### Prerequisites
 - [Node.js](https://nodejs.org)
@@ -19,7 +23,7 @@ WIP version of Drathybot, a custom Node.js/twitch-irc bot.
 3. To start the bot, run `Drathybot.vbs`
 
 ### Use
-- Drathybot accepts no commands from the console, but you can use `Ctrl`+`C` to close it.
+- Omnibot accepts no commands from the console, but you can use `Ctrl`+`C` to close it.
 
 ### Documentation
 - `!stop`:
@@ -29,7 +33,7 @@ WIP version of Drathybot, a custom Node.js/twitch-irc bot.
 - `!time <user=[executor]>`:
   - Says how many minutes the viewer has logged.
 - Points:
-  - Points are the loyalty system of Drathybot. By being in the chat while the stream is live, you earn points.
+  - Points are the loyalty system of Omnibot. By being in the chat while the stream is live, you earn points.
   - `!balance <user=[executor]>`:
     - Tells a user how many points they have.
   - `!top <number=[default=3]>`:
@@ -41,7 +45,7 @@ WIP version of Drathybot, a custom Node.js/twitch-irc bot.
     - Adds an amount of points to the user's (or all users') balance(s)
     - Defaults to broadcaster only.
 - Quotes:
-  - Someone said something funny, but it's probably going to get forgotten? Not anymore! Introducing: Drathybot Quotes!
+  - Someone said something funny, but it's probably going to get forgotten? Not anymore! Introducing: Omnibot Quotes!
   - `!quote <author> <quote..>`:
     - Adds a quote to the database.
   - `!recite <author=[random]>`:
@@ -61,7 +65,7 @@ WIP version of Drathybot, a custom Node.js/twitch-irc bot.
     - Rank can be `new`, `viewer`, `mod`, `admin`
 
 ### Links
-  - To see what we're up to, our [Trello](https://trello.com/b/zUJNkwOP/drathybot)
+  - To see what we're up to, our [Trello](https://trello.com/b/zUJNkwOP/omnibot)
   - Check out our streams:
     - [Drathy](http://www.twitch.tv/drathy)
     - [Aari](http://www.twitch.tv/aaritak)
