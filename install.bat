@@ -1,6 +1,6 @@
 @echo off
 
-echo Welcome to the installer for Drathybot!
+echo Welcome to the installer for Omnibot!
 timeout 3 > NUL
 echo Before we begin, we need the path of MongoDB's executables.
 timeout 2 > NUL
