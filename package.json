@@ -1,9 +1,9 @@
 {
-    "name": "DrathyBot",
+    "name": "Omnibot",
     "version": "0.2.0",
-    "description": "A custom Node.js/twitch-irc bot.",
+    "description": "A highly configurable twitch chat bot made with Node.js & tmi.js.",
     "main": "lib/bot.js",
-    "repository": "https://github.com/vaughnroyko/DrathybotAlpha",
+    "repository": "https://github.com/vaughnroyko/Omnibot",
     "dependencies": {
         "chalk": "*",
         "twitch-irc": "*",
