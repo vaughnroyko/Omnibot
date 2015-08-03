@@ -12,7 +12,7 @@
         "season": "*",
         "underscore-plus": "*",
         "fs-extra": "*",
-        "deasync": "*",
+        "synchronicity": "*",
         "circular-json": "*"
     }
 }
