@@ -35,10 +35,9 @@ echo   goto :EOF >> s.bat
 echo ) >> s.bat
 echo cd database >> s.bat
 echo i.vbs "start /WAIT restart.bat" >> s.bat
-echo cd .. >> s.bat
-echo start "Drathybot" node %~dp0 >> s.bat
+echo start . node %~dp0 >> s.bat
 
-echo CreateObject("Wscript.Shell").Run "s.bat", 0, True > Drathybot.vbs
+echo CreateObject("Wscript.Shell").Run "s.bat", 0, True > Omnibot.vbs
 
 cd database
 
@@ -60,7 +59,7 @@ echo timeout 1 >> restart.bat
 echo wscript.exe i.vbs "start.bat" >> restart.bat
 echo exit >> restart.bat
 
-echo Drathybot is finished installing!
+echo Omnibot has finished installing!
 
 cd ..
 timeout 5
