@@ -15,12 +15,12 @@ The current versions of Omnibot are very unstable as we change the API very freq
 ##### Windows
 1. Run `install.bat`.
   - The installer should ask you for the path of MongoDB. If you installed to `C:/Program Files/MongoDB` then you can just hit enter. If else, you need to give it the path of the .exe files. Example: `path/to/MongoDB/Server/3.0/bin`
-    - To change the path of MongoDB later, you can edit the file `DrathybotAlpha/database/mongo.loc`
+    - To change the path of MongoDB later, you can edit the file `Omnibot/database/mongo.loc`
 2. Edit `options/twitch.cson`:
   - Replace `identity.username` with the username of your bot.
   - Replace `identity.password` with your bot's [oauth key](http://www.twitchapps.com/tmi/).
   - Add your channel name to the `channels` array.
-3. To start the bot, run `Drathybot.vbs`
+3. To start the bot, run `Omnibot.vbs`
 
 ### Use
 - Omnibot accepts no commands from the console, but you can use `Ctrl`+`C` to close it.
