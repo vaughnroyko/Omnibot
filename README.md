@@ -1,8 +1,8 @@
 # Omnibot
 A highly configurable twitch chat bot made with Node.js & tmi.js.
 
-# WARNING!!!
-## Use at your own risk!
+## WARNING!!!
+### Use at your own risk!
 The current versions of Omnibot are very unstable as we change the API very frequently (and also break things pretty often). We're not responsible for any harm this version may cause. To you, your computer, or your twitch chat. Thanks. <3
 
 ## Using Omnibot
