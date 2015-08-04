@@ -1,11 +1,11 @@
 @echo off
 
 echo Welcome to the installer for Omnibot!
-timeout 3 > NUL
+timeout 2 > NUL
 echo Before we begin, we need the path of MongoDB's executables.
-timeout 2 > NUL
+timeout 1 > NUL
 echo For example, the default install is C:/Program Files/MongoDB/Server/3.0/bin
-timeout 2 > NUL
+timeout 1 > NUL
 echo You can press [Enter] if that is your path.
 timeout 2 > NUL
 
@@ -35,7 +35,8 @@ echo   goto :EOF >> s.bat
 echo ) >> s.bat
 echo cd database >> s.bat
 echo i.vbs "start /WAIT restart.bat" >> s.bat
-echo start . node %~dp0 >> s.bat
+echo cd .. >> s.bat
+echo start "Omnibot" node %%~dp0 >> s.bat
 
 echo CreateObject("Wscript.Shell").Run "s.bat", 0, True > Omnibot.vbs
 
