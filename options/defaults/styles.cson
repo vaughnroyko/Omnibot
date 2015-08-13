@@ -15,3 +15,4 @@ keyword: 'yellow.bold.underline'
 console:
     info: 'grey'
     error: 'red.bold'
+    data: 'cyan.bold'
