@@ -2,7 +2,3 @@ options:
     debug: false
     debugIgnore: ['ping', 'chat', 'join', 'part']
     tc: 1
-identity:
-    username: 'aaribot'
-    password: 'oauth:qox0t2blli27w5f8qo3e20atwx84nd'
-channels: ['drathy']
