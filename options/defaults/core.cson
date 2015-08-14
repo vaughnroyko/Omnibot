@@ -1,4 +1,4 @@
-exitOnException: true
+exitOnException: false
 
 prefixes:
     basic: "!"
@@ -25,4 +25,6 @@ keywords: []
 # the time it takes for a user to be able to use more advanced bot commands (like quote and such)
 userTrustTime: 120
 
-blacklist: []
+blacklist: [
+    "Moobot"
+]

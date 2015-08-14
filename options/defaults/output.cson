@@ -1,16 +1,18 @@
-stopTheBot: "#REKT"
+stopTheBot: "{0} has left the chat."
 distributeSuccess: "A generous user has donated a total of {0} points to {1} users!"
 stealSuccess: "The tax collector has arrived! A total of {0} points was taxed from {1} users!"
 notLive: "{0} is not live!"
 streamTime: "{0} has been streaming for {1} hours and {2} minutes."
 trustUser: "{0} is now a trusted user!"
 
+listUsers: "Chatters: {0}"
+
 messages:
     # {0} = timestamp
     # {1} = user
     # {2} = message
     format: "{0} {1}: {2}"
-    noUser: "{0} {2}"
+    noUser: "{0} {1}"
     showCommandCalls: true
     showBotChatMessagesInConsole: true
     timestamp:
@@ -19,9 +21,12 @@ messages:
         # {2} = minute
         # {3} = second
         # {4} = a/p
-        format: "{1}:{2}:{3}{4}"
+        format: "{0}:{2}:{3}"
         am: "AM"
         pm: "PM"
 
-    defaultListSize: 3
-    maxListSize: 10
+list:
+    size:
+        default: 3
+        max: 10
+    separator: ", "

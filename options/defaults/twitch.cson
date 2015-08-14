@@ -1,7 +1,8 @@
 options:
     debug: false
+    debugIgnore: ['ping', 'chat', 'join', 'part']
+    tc: 1
 identity:
-    username: ''
-    password: 'oauth:'
-# begin channel name with an octothorpe (#)
-channels: ['']
+    username: 'aaribot'
+    password: 'oauth:qox0t2blli27w5f8qo3e20atwx84nd'
+channels: ['drathy']

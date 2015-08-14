@@ -5,14 +5,13 @@
     "main": "lib/bot.js",
     "repository": "https://github.com/vaughnroyko/Omnibot",
     "dependencies": {
-        "chalk": "*",
         "tmi.js": "*",
-        "request": "*",
         "mongoose": ">=3.8.1",
-        "season": "*",
-        "underscore-plus": "*",
+        "request": "*",
         "fs-extra": "*",
+        "underscore-plus": "*",
+        "season": "*",
         "synchronicity": "*",
-        "circular-json": "*"
+        "chalk": "*"
     }
 }

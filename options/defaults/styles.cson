@@ -4,7 +4,7 @@ event:
     leave: 'grey'
     command: 'grey.bold'
 
-user: 'white'
+user: 'white.dim'
 moderator: '#user'
 broadcaster: '#user'
 points: 'green.bold'
