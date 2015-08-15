@@ -47,7 +47,7 @@ echo CreateObject("Wscript.Shell").Run "" ^& WScript.Arguments(0) ^& "", 0, Fals
 echo del db.log > start.bat
 echo setlocal >> start.bat
 echo (set /p loc=) ^< mongo.loc >> start.bat
-echo "%%loc%%/mongod.exe" --dbpath %%~dp0 --logpath db.log >> start.bat
+echo "%%loc%%/mongod.exe" --dbpath "%%~dp0\" --logpath db.log >> start.bat
 echo endlocal >> start.bat
 
 echo setlocal > stop.bat

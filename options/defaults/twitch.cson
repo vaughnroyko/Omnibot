@@ -1,4 +1,4 @@
-options:
-    debug: false
-    debugIgnore: ['ping', 'chat', 'join', 'part']
-    tc: 1
+identity:
+    username: ''
+    password: '' # use an oauth token generated from http://www.twitchapps.com/tmi/
+channel: ''
