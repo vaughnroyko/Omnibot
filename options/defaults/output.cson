@@ -1,6 +1,4 @@
 stopTheBot: "{0} has left the chat."
-distributeSuccess: "A generous user has donated a total of {0} points to {1} users!"
-stealSuccess: "The tax collector has arrived! A total of {0} points was taxed from {1} users!"
 notLive: "{0} is not live!"
 streamTime: "{0} has been streaming for {1} hours and {2} minutes."
 trustUser: "{0} is now a trusted user!"
@@ -12,8 +10,7 @@ messages:
     # {0} = timestamp
     # {1} = user
     # {2} = message
-    format: "{0} {1}: {2}"
-    noUser: "{0} {1}"
+    format: "{1?{0} {1}\\::{0}} {2}"
     showCommandCalls: true
     showBotChatMessagesInConsole: true
     timestamp:
@@ -31,3 +28,21 @@ list:
         default: 3
         max: 10
     separator: ", "
+
+fail:
+    default: "Sorry, {0}, there was an unknown error."
+
+core:
+    time:
+        normal: "{2?You have:{0} has} {1} minutes logged{2?, {0}}!"
+        blacklisted: "{1?Your:{2?My own:{0}'s}} amount of time logged exceeds the limits of my computational power{1?, {0}}."
+        unknown: "It seems {1?you're:{0} is} not in my database yet{1?, {0}}."
+
+points:
+    distributeSuccess: "A generous user has donated a total of {0} points to {1} users!"
+    taxSuccess: "The tax collector has arrived! A total of {0} points was taxed from {1} users!"
+
+    balance:
+        normal: "{2?You have:{0} has} {1} points{2?, {0}}!"
+        blacklisted: "{1?Your:{2?My own:{0}'s}} balance exceeds the limits of my computational power{1?, {0}}."
+        unknown: "It seems {1?you're:{0} is} not in my database yet{1?, {0}}."

@@ -12,6 +12,7 @@
         "underscore-plus": "*",
         "season": "*",
         "synchronicity": "*",
-        "chalk": "*"
+        "chalk": "*",
+        "weaving": "*"
     }
 }
