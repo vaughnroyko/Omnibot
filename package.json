@@ -13,6 +13,6 @@
         "season": "*",
         "synchronicity": "*",
         "chalk": "*",
-        "weaving": "*"
+        "weaving": ">=0.1.1"
     }
 }
