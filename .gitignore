@@ -9,3 +9,4 @@ options/*
 !options/defaults/
 *.log
 import
+lib/debug.cson

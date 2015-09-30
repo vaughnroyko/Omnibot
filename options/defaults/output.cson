@@ -6,6 +6,8 @@ trustUser: "{0} is now a trusted user!"
 listUsers: "Chatters: {0}"
 noUsers: "There are no users in the chat!"
 
+logCommandFails: false
+
 messages:
     # {0} = timestamp
     # {1} = user
