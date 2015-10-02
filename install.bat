@@ -2,14 +2,15 @@
 
 echo Welcome to the installer for Omnibot!
 timeout 2 > NUL
-echo Before we begin, we need the path of MongoDB's executables.
+echo. & echo Before we begin, we need the path of MongoDB's executables.
 timeout 1 > NUL
-echo For example, the default install is C:/Program Files/MongoDB/Server/3.0/bin
+echo The default install path is  C:/Program Files/MongoDB/Server/3.0/bin
 timeout 1 > NUL
 echo You can press [Enter] if that is your path.
 timeout 2 > NUL
+echo.
 
-mkdir database
+mkdir database > nul 2> nul
 
 setlocal
 :askMongoFolder
@@ -20,12 +21,13 @@ if NOT exist "%loc%mongo.exe" goto askMongoFolder
 if NOT exist "%loc%mongod.exe" goto askMongoFolder
 echo %loc% > "database/mongo.loc"
 endlocal
+echo.
 
 echo Installing modules...
 call npm install
 
 echo Finished installing modules.
-echo Creating more batch files...
+echo Writing files...
 
 echo if "%%~1"=="-FIXED_CTRL_C" ( > s.bat
 echo   shift >> s.bat
@@ -36,7 +38,9 @@ echo ) >> s.bat
 echo cd database >> s.bat
 echo i.vbs "start /WAIT restart.bat" >> s.bat
 echo cd .. >> s.bat
-echo start "Omnibot" node %%~dp0 >> s.bat
+echo start /WAIT "Omnibot" node %%~dp0 >> s.bat
+echo cd database >> s.bat
+echo i.vbs "stop.bat" >> s.bat
 
 echo CreateObject("Wscript.Shell").Run "s.bat", 0, True > Omnibot.vbs
 
@@ -59,6 +63,8 @@ echo call stop.bat > restart.bat
 echo timeout 1 >> restart.bat
 echo wscript.exe i.vbs "start.bat" >> restart.bat
 echo exit >> restart.bat
+
+echo.
 
 echo Omnibot has finished installing!
 
