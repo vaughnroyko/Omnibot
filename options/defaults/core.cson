@@ -1,4 +1,9 @@
-commandPrefix: "!"
+exitOnException: false
+
+prefixes:
+    basic: "!"
+    mod: "^"
+    admin: "@"
 
 logChats: true
 
@@ -14,7 +19,10 @@ modules:
     quotes:
         enabled: true
 
-modsCanRunBroadcasterCommands: true
-
 # channel name is included by default
 keywords: []
+
+# the time it takes for a user to be able to use more advanced bot commands (like quote and such)
+userTrustTime: 120
+
+blacklist: []

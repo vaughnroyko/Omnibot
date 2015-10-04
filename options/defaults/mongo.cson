@@ -1,1 +1,6 @@
 path: 'mongodb://localhost/21017'
+
+connection:
+    server:
+        socketOptions:
+            connectTimeoutMS: 2000

@@ -5,13 +5,14 @@
     "main": "lib/bot.js",
     "repository": "https://github.com/vaughnroyko/Omnibot",
     "dependencies": {
-        "chalk": "*",
-        "twitch-irc": "*",
-        "twitch-irc-api": "*",
+        "tmi.js": "*",
+        "mongoose": ">=3.8.1",
         "request": "*",
-        "mongoose": "*",
-        "season": "*",
+        "fs-extra": "*",
         "underscore-plus": "*",
-        "fs-extra": "*"
+        "season": "*",
+        "synchronicity": "*",
+        "chalk": "*",
+        "weaving": ">=0.2.0"
     }
 }
