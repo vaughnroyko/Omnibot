@@ -48,3 +48,9 @@ points:
         normal: "{2?You have:{0} has} {1} points{2?, {0}}!"
         blacklisted: "{1?Your:{2?My own:{0}'s}} balance exceeds the limits of my computational power{1?, {0}}."
         unknown: "It seems {1?you're:{0} is} not in my database yet{1?, {0}}."
+
+quote:
+    normal: "\"{1}\" quote added for {0}!"
+    unknown: "It seems {0} not in my database yet!"
+    rank: "Only regular viewers can use this command, {0}!"
+    syntax: "Proper syntax: !quote Drathy Really funny thing."
