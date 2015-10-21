@@ -58,7 +58,7 @@ quote:
 
 commands:
     logCommandFails: false
-    notFound: "Could not find command by name '{0}'"
+    notFound: "{1} tried to run the command '{0}' but it doesn't exist"
 
     notExist: "Command '{0}' does not exist"
     create:
