@@ -10,7 +10,7 @@ messages:
     # {0} = timestamp
     # {1} = user
     # {2} = message
-    format: "{1?{0} {1}~::{0}} {2}"
+    format: "{1?{0} {1.name}~::{0}} {2}"
     showCommandCalls: true
     showBotChatMessagesInConsole: true
     timestamp:
