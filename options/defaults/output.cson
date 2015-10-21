@@ -41,8 +41,8 @@ core:
         unknown: "It seems {1?you're:{0} is} not in my database yet{1?, {0}}."
 
 points:
-    distributeSuccess: "A generous user has donated a total of {0} points to {1} users!"
-    taxSuccess: "The tax collector has arrived! A total of {0} points was taxed from {1} users!"
+    distributeSuccess: "A total of {0} points was distributed to {1} users."
+    taxSuccess: "A total of {0} points was taxed from {1} users."
 
     balance:
         normal: "{2?You have:{0} has} {1} points{2?, {0}}!"
