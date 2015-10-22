@@ -38,6 +38,11 @@ core:
         blacklisted: "{1?Your:{2?My own:{0}'s}} amount of time logged exceeds the limits of my computational power{1?, {0}}."
         unknown: "It seems {1?you're:{0} is} not in my database yet{1?, {0}}."
 
+    rank:
+        notExist: "There's no user by the name '{0}'"
+        invalid: "'{0}' is not a valid rank"
+        success: "Successfully changed {0.name}'s rank to {1}"
+
 points:
     distributeSuccess: "A total of {0} points was distributed to {1} users."
     taxSuccess: "A total of {0} points was taxed from {1} users."
