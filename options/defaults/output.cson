@@ -3,8 +3,7 @@ notLive: "{0} is not live!"
 streamTime: "{0} has been streaming for {1} hours and {2} minutes."
 trustUser: "{0} is now a trusted user!"
 
-listUsers: "Chatters: {0}"
-noUsers: "There are no users in the chat!"
+listUsers: "{0..?Chatters~: {0*, }:There are no users in the chat!}"
 
 messages:
     # {0} = timestamp
@@ -27,7 +26,6 @@ list:
     size:
         default: 3
         max: 10
-    separator: ", "
 
 fail:
     default: "Sorry, {0}, there was an unknown error."
@@ -54,6 +52,8 @@ points:
 
     firstjoin: "Gave {0} {1} points for joining for the first time."
     joinInfo: "{0} has {1} points!"
+
+    top: "Top {0}: {1*, :{&.user}~: {&.count}}"
 
 quote:
     normal: "\"{1}\" quote added for {0}!"
