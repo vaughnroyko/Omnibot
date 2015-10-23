@@ -55,6 +55,11 @@ points:
 
     top: "Top {0}: {1*, :{&.user}~: {&.count}}"
 
+    donate:
+        notEnough: "You are short {1} points, {0}"
+        notExist: "{1} is not a valid user, {0}"
+        success: "{0} has given {1} {2} points!"
+
 quote:
     normal: "\"{1}\" quote added for {0}!"
     unknown: "It seems {0} not in my database yet!"
