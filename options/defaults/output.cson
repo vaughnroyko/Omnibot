@@ -1,7 +1,7 @@
 stopTheBot: "{0} has left the chat."
 notLive: "{0} is not live!"
 streamTime: "{0} has been streaming for {1} hours and {2} minutes."
-trustUser: "{0} is now a trusted user!"
+trustUser: "{0.displayName} is now a trusted user!"
 
 listUsers: "{0..?Chatters~: {0*, }:There are no users in the chat!}"
 
@@ -9,7 +9,7 @@ messages:
     # {0} = timestamp
     # {1} = user
     # {2} = message
-    format: "{1?{0} {1.name}~::{0}} {2}"
+    format: "{1?{0} {1.displayName}~::{0}} {2}"
     showCommandCalls: true
     showBotChatMessagesInConsole: true
     timestamp:
@@ -28,47 +28,47 @@ list:
         max: 10
 
 fail:
-    default: "Sorry, {0}, there was an unknown error."
+    default: "Sorry, {0.displayName}, there was an unknown error."
 
 core:
     time:
-        normal: "{2?You have:{0} has} {1} minutes logged{2?, {0}}!"
-        blacklisted: "{1?Your:{2?My own:{0}'s}} amount of time logged exceeds the limits of my computational power{1?, {0}}."
-        unknown: "It seems {1?you're:{0} is} not in my database yet{1?, {0}}."
+        normal: "{2?You have:{0.displayName} has} {0.time} minutes logged{2?, {0.displayName}}!"
+        blacklisted: "{1?Your:{2?My own:{0.displayName}'s}} amount of time logged exceeds the limits of my computational power{1?, {0.displayName}}."
+        unknown: "It seems {1?you're:{0.displayName} is} not in my database yet{1?, {0.displayName}}."
 
     rank:
         notExist: "There's no user by the name '{0}'"
         invalid: "'{0}' is not a valid rank"
-        success: "Successfully changed {0.name}'s rank to {1}"
+        success: "Successfully changed {0.displayName}'s rank to {1}"
 
 points:
     distributeSuccess: "A total of {0} points was distributed to {1} users."
     taxSuccess: "A total of {0} points was taxed from {1} users."
 
     balance:
-        normal: "{2?You have:{0} has} {1} points{2?, {0}}!"
-        blacklisted: "{1?Your:{2?My own:{0}'s}} balance exceeds the limits of my computational power{1?, {0}}."
-        unknown: "It seems {1?you're:{0} is} not in my database yet{1?, {0}}."
+        normal: "{2?You have:{0.displayName} has} {1} points{2?, {0.displayName}}!"
+        blacklisted: "{1?Your:{2?My own:{0.displayName}'s}} balance exceeds the limits of my computational power{1?, {0.displayName}}."
+        unknown: "It seems {1?you're:{0} is} not in my database yet{1?, {0.displayName}}."
 
-    firstjoin: "Gave {0} {1} points for joining for the first time."
-    joinInfo: "{0} has {1} points!"
+    firstjoin: "Gave {0.displayName} {1} points for joining for the first time."
+    joinInfo: "{0.displayName} has {1} points!"
 
     top: "Top {0}: {1*, :{&.user}~: {&.count}}"
 
     donate:
-        notEnough: "You are short {1} points, {0}"
-        notExist: "{1} is not a valid user, {0}"
-        success: "{0} has given {1} {2} points!"
+        notEnough: "You are short {1} points, {0.displayName}"
+        notExist: "{1} is not a valid user, {0.displayName}"
+        success: "{0.displayName} has given {1.displayName} {2} points!"
 
 quote:
-    normal: "\"{1}\" quote added for {0}!"
+    normal: "\"{1}\" quote added for {0.displayName}!"
     unknown: "It seems {0} not in my database yet!"
-    rank: "Only regulars can use this command, {0}."
+    rank: "Only regulars can use this command, {0.displayName}."
     syntax: "Proper syntax: !quote User Some text here."
 
 commands:
     logCommandFails: false
-    notFound: "{1} tried to run the command '{0}' but it doesn't exist"
+    notFound: "{1.displayName} tried to run the command '{0}' but it doesn't exist"
 
     notExist: "The custom command by name '{0}' does not exist"
     create:
