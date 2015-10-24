@@ -70,7 +70,7 @@ commands:
     logCommandFails: false
     notFound: "{1} tried to run the command '{0}' but it doesn't exist"
 
-    notExist: "Command '{0}' does not exist"
+    notExist: "The custom command by name '{0}' does not exist"
     create:
         success: "Command '{0}' was successfully added"
         fail: "Command '{0}' could not be added"
