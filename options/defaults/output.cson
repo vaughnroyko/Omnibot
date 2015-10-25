@@ -1,9 +1,12 @@
-stopTheBot: "{0} has left the chat."
-notLive: "{0} is not live!"
-streamTime: "{0} has been streaming for {1} hours and {2} minutes."
-trustUser: "{0.displayName} is now a trusted user!"
+bot:
+    stop: "{0} has left the chat."
+    restart: "{0} is restarting."
+    notLive: "{0} is not live!"
+    time: "{0} has been streaming for {1} hours and {2} minutes."
 
-listUsers: "{0..?Chatters~: {0*, }:There are no users in the chat!}"
+    users:
+        rankUp: "{0.displayName} is now a trusted user!"
+        list: "{0..?Chatters~: {0*, }:There are no users in the chat!}"
 
 messages:
     # {0} = timestamp
