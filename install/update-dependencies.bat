@@ -1,1 +1,4 @@
+
+cd ..
+
 npm install
