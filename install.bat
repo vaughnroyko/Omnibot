@@ -29,7 +29,7 @@ call update-dependencies.bat
 echo Finished installing modules.
 
 cd install
-call update.bat
+call writefiles.bat
 
 echo.
 

@@ -1,9 +1,9 @@
 # Omnibot
 A highly configurable twitch chat bot made with Node.js & tmi.js.
 
-## WARNING!!!
-### Use at your own risk!
-The current versions of Omnibot are very unstable as we change the API very frequently (and also break things pretty often). We're not responsible for any harm this version may cause. To you, your computer, or your twitch chat. Thanks. <3
+## Warning!
+### Use at your own risk
+The current versions of Omnibot are unstable. We change the API very frequently (and also break things pretty often). Unit tests are coming eventually, and when that happens it'll go much smoother. At the moment, tho, it's still kinda a mess. This is just a disclaimer, you can use this version if you like. It'll probably work fine! But keep in mind that we're not responsible for any harm this version may cause. To you, your computer, or your twitch chat. Thanks. <3
 
 ## Using Omnibot
 
@@ -16,11 +16,23 @@ The current versions of Omnibot are very unstable as we change the API very freq
 1. Run `install.bat`.
   - The installer should ask you for the path of MongoDB. If you installed to `C:/Program Files/MongoDB` then you can just hit enter. If else, you need to give it the path of the .exe files. Example: `path/to/MongoDB/Server/3.0/bin`
     - To change the path of MongoDB later, you can edit the file `Omnibot/database/mongo.loc`
-2. Edit `options/twitch.cson`:
+2. Run the bot using `Omnibot.vbs`. It will generate files, but should not turn on quite yet.
+3. Edit the generated file `options/twitch.cson`:
   - Replace `identity.username` with the username of your bot.
   - Replace `identity.password` with your bot's [oauth key](http://www.twitchapps.com/tmi/).
-  - Add your channel name to the `channels` array.
-3. To start the bot, run `Omnibot.vbs`
+  - Set `channel` to the channel you'd like the bot to connect to.
+4. You're done! Start the bot the same way whenever you like. If you'd like to change any other config files, feel free to. We'd recommend leaving the defaults as is tho!
+##### Other
+1. Run MongoDB.
+2. Run the bot with Node.js.
+  - `cd <path to the Omnibot folder>`
+  - `node .`
+  It will generate files, but should not turn on quite yet.
+3. Edit the generated file `options/twitch.cson`:
+  - Replace `identity.username` with the username of your bot.
+  - Replace `identity.password` with your bot's [oauth key](http://www.twitchapps.com/tmi/).
+  - Set `channel` to the channel you'd like the bot to connect to.
+4. You're done! Start the bot the same way whenever you like. If you'd like to change any other config files, feel free to. We'd recommend leaving the defaults as is tho!
 
 ### Use
 - Omnibot accepts no commands from the console, but you can use `Ctrl`+`C` to close it.

@@ -1,6 +1,6 @@
 {
     "name": "Omnibot",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "A highly configurable twitch chat bot made with Node.js & tmi.js.",
     "main": "lib/bot.js",
     "repository": "https://github.com/vaughnroyko/Omnibot",
@@ -11,8 +11,8 @@
         "fs-extra": "*",
         "underscore-plus": "*",
         "season": "*",
-        "synchronicity": "*",
+        "synchronicity": ">=0.0.3",
         "chalk": "*",
-        "weaving": ">=0.3.1"
+        "weaving": ">=0.3.2"
     }
 }
