@@ -38,9 +38,14 @@ echo ) >> s.bat
 echo cd database >> s.bat
 echo i.vbs "start /WAIT restart.bat" >> s.bat
 echo cd .. >> s.bat
+echo :start >> s.bat
 echo start /WAIT "Omnibot" node %%~dp0 >> s.bat
-echo cd database >> s.bat
-echo i.vbs "stop.bat" >> s.bat
+echo if errorlevel 4 ( >> s.bat
+echo   goto :start >> s.bat
+echo ) else ( >> s.bat
+echo   cd database >> s.bat
+echo   i.vbs "stop.bat" >> s.bat
+echo ) >> s.bat
 
 echo CreateObject("Wscript.Shell").Run "s.bat", 0, True > Omnibot.vbs
 
