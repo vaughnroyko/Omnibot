@@ -69,6 +69,10 @@ quote:
     rank: "Only regulars can use this command, {0.displayName}."
     syntax: "Proper syntax: !quote User Some text here."
 
+recite:
+    normal: "\"{0.quote}\" -{0.author}, {1} (Added by {0.added})"
+    noQuotes: "There are no quotes in my database yet!"
+
 commands:
     logCommandFails: false
     notFound: "{1.displayName} tried to run the command '{0}' but it doesn't exist"
