@@ -9,19 +9,11 @@ bot:
         list: "{0..?Chatters~: {0*, }:There are no users in the chat!}"
 
 messages:
-    # {0} = timestamp
-    # {1} = user
-    # {2} = message
-    format: "{1?{0} {1.displayName}{3?:~:}:{0}} {2}"
+    format: "{time}{user? {user.displayName}{action?:~:}} {message}"
     showCommandCalls: true
     showBotChatMessagesInConsole: true
     timestamp:
-        # {0} = hour
-        # {1} = hour 1-12
-        # {2} = minute
-        # {3} = second
-        # {4} = a/p
-        format: "{0}:{2}:{3}"
+        format: "{hour}:{minute}:{second}"
         am: "AM"
         pm: "PM"
 
