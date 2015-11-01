@@ -61,6 +61,10 @@ quote:
     rank: "Only regulars can use this command, {0.displayName}."
     syntax: "Proper syntax: !quote User Some text here."
 
+raffle:
+    winner: "{0}, winner is you!"
+    noWinner: "There was no valid users found for the raffle."
+
 recite:
     normal: "\"{0.quote}\" -{0.author}, {1} (Added by {0.added})"
     noQuotes: "There are no quotes in my database yet!"
