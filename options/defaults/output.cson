@@ -56,7 +56,7 @@ points:
         success: "{0.displayName} has given {1.displayName} {2} points!"
 
 quote:
-    normal: "\"{1}\" quote added for {0.displayName}!"
+    normal: "The quote by {0.displayName} was added! \"{1}\""
     unknown: "It seems {0} not in my database yet!"
     rank: "Only regulars can use this command, {0.displayName}."
     syntax: "Proper syntax: !quote User Some text here."
