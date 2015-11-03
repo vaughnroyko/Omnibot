@@ -10,3 +10,4 @@ options/*
 *.log
 import
 lib/debug.cson
+install/patches/backup

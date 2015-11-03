@@ -5,7 +5,7 @@
     "main": "lib/bot.js",
     "repository": "https://github.com/vaughnroyko/Omnibot",
     "dependencies": {
-        "tmi.js": "*",
+        "tmi.js": "0.0.21",
         "mongoose": ">=3.8.1",
         "request": "*",
         "fs-extra": "*",
