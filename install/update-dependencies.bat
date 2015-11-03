@@ -1,17 +1,17 @@
 @echo off
 
-echo Restoring...
+echo   Restoring...
 
 call "restore.bat"
 
-echo Done!
-echo Updating...
+echo   Done!
+echo   Updating...
 
 call npm install
 
-echo Patching...
+echo   Patching...
 
 cd install
 call "patch.bat"
 
-echo Done!
+echo   Done!

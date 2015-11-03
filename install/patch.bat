@@ -7,10 +7,10 @@ if exist "install\patches\backup\" (
 
 mkdir "install\patches\backup"
 
-REM start patch
+:: start patch
 
 copy "node_modules\tmi.js\lib\logger.js" "install\patches\backup\tmijs.logger.js" /y >nul
 copy "install\patches\tmijs.logger.js" "node_modules\tmi.js\lib\logger.js" /y >nul
 
 
-REM complete patch
+:: complete patch
