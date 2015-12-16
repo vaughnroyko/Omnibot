@@ -36,6 +36,8 @@ core:
         invalid: "'{0}' is not a valid rank"
         success: "Successfully changed {0.displayName}'s rank to {1}"
 
+    whois: "{0.name}{1? [{1}]}: {2}"
+
 points:
     distributeSuccess: "A total of {0} points was distributed to {1} users."
     taxSuccess: "A total of {0} points was taxed from {1} users."
