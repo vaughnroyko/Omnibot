@@ -29,7 +29,7 @@ core:
     time:
         normal: "{2?You have:{0.displayName} has} {0.time} minutes logged{2?, {0.displayName}}!"
         blacklisted: "{1?Your:{2?My own:{0.displayName}'s}} amount of time logged exceeds the limits of my computational power{1?, {0.displayName}}."
-        unknown: "It seems {1?you're:{0.displayName} is} not in my database yet{1?, {0.displayName}}."
+        unknown: "It seems {1?you're:'{0.displayName}' is} not in my database yet{1?, {0.displayName}}."
 
     rank:
         notExist: "There's no user by the name '{0}'"
