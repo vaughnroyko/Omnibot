@@ -5,8 +5,10 @@ bot:
     time: "{0} has been streaming for {1} hours and {2} minutes."
 
     users:
-        rankUp: "{0.displayName} is now a trusted user!"
+        rankUp: "{displayName} is now a trusted user!"
         list: "{0..?Chatters~: {0*, }:There are no users in the chat!}"
+        join: "{displayName} has joined!"
+        part: "{displayName} has left."
 
 messages:
     format: "{time}{user? {user.displayName}{action?:~:}} {message}"
