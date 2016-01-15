@@ -55,9 +55,10 @@ points:
     top: "Top {0}: {1*, :{&.user}~: {&.count}}"
 
     donate:
-        notEnough: "You are short {1} points, {0.displayName}"
-        notExist: "{1} is not a valid user, {0.displayName}"
-        success: "{0.displayName} has given {1.displayName} {2} points!"
+        notEnough: "You are short {1} points, {displayName}"
+        notExist: "{1} is not a valid user, {displayName}"
+        success: "{displayName} has given {1.displayName} {2} points!"
+        thief: "Are you trying to steal, {displayName}?"
 
 quote:
     normal: "The quote by {0.displayName} was added! \"{1}\""
