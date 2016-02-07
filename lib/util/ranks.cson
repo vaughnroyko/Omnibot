@@ -1,7 +1,9 @@
 bot: 5
 broadcaster: 4
 admin: 3
+administrator: 3
 mod: 2
+moderator: 2
 viewer: 1
 regular: 1
 user: 0

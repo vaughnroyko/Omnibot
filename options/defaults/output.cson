@@ -12,8 +12,10 @@ bot:
 
 messages:
     format: "{time}{user? {user.displayName}{action?:~:}} {message}"
-    showCommandCalls: true
-    showBotChatMessagesInConsole: true
+    show:
+        commandCalls: true
+        botOutput: true
+        twitchApiFailure: true
     timestamp:
         format: "{hour}:{minute}:{second}"
         am: "AM"
