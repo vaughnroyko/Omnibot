@@ -12,3 +12,4 @@ import
 lib/debug.cson
 install/patches/backup
 lib/new
+lib/old
