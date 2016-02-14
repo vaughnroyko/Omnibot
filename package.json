@@ -14,5 +14,8 @@
         "synchronicity": ">=0.0.3",
         "chalk": "*",
         "weaving": ">=0.3.4"
+    },
+    "engines": {
+        "node" : ">=5.6.0"
     }
 }
