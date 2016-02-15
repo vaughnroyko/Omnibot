@@ -1,0 +1,1 @@
+jasmine-node . --color --coffee --autotest --watch ..
