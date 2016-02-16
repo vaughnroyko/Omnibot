@@ -35,3 +35,4 @@ describe "logger.", ->
 
     if logger
         it "should produce a log folder", ->
+            # TODO
