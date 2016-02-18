@@ -36,3 +36,4 @@ describe "logger.", ->
     if logger
         it "should produce a log folder", ->
             # TODO
+            # test for it not moving the old log folder if it's empty
