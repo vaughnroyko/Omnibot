@@ -1,3 +1,12 @@
+timestamp: "{#grey:{hour}:{minute}:{second}}"
+
+messages:
+    format: "{user? {user.displayName}{action?:~:}} {message}"
+    show:
+        commandCalls: true
+        botOutput: true
+        twitchApiFailure: true
+
 bot:
     stop: "{0} has left the chat."
     restart: "{0} is restarting."
@@ -9,17 +18,6 @@ bot:
         list: "{0..?Chatters~: {0*, }:There are no users in the chat!}"
         join: "{displayName} has joined!"
         part: "{displayName} has left."
-
-messages:
-    format: "{time}{user? {user.displayName}{action?:~:}} {message}"
-    show:
-        commandCalls: true
-        botOutput: true
-        twitchApiFailure: true
-    timestamp:
-        format: "{hour}:{minute}:{second}"
-        am: "AM"
-        pm: "PM"
 
 list:
     size:
@@ -42,6 +40,29 @@ core:
 
     whois: "{0.name}{1? [{1}]}: {2}"
 
+commands:
+    logCommandFails: false
+    notFound: "{1.displayName} tried to run the command '{0}' but it doesn't exist"
+
+    notExist: "The custom command by name '{0}' does not exist"
+    create:
+        success: "Command '{0}' was successfully added"
+        fail: "Command '{0}' could not be added"
+        exist: "Command '{0}' already exists"
+    edit:
+        success: "Command '{0}' was successfully edited"
+        fail: "Command '{0}' could not be edited"
+    remove:
+        success: "Command '{0}' was successfully removed"
+        fail: "Command '{0}' could not be removed"
+    rename:
+        success: "Command '{0}' was successfully renamed to '{1}'"
+        fail: "Command '{0}' could not be renamed"
+
+raffle:
+    winner: "{0}, winner is you!"
+    noWinner: "There was no valid users found for the raffle."
+
 points:
     distributeSuccess: "A total of {0} points was distributed to {1} users."
     taxSuccess: "A total of {0} points was taxed from {1} users."
@@ -61,36 +82,13 @@ points:
         notExist: "{1} is not a valid user, {displayName}"
         success: "{displayName} has given {1.displayName} {2} points!"
         thief: "Are you trying to steal, {displayName}?"
+quotes:
+    quote:
+        normal: "The quote by {0.displayName} was added! \"{1}\""
+        unknown: "It seems {0} not in my database yet!"
+        rank: "Only regulars can use this command, {0.displayName}."
+        syntax: "Proper syntax: !quote User Some text here."
 
-quote:
-    normal: "The quote by {0.displayName} was added! \"{1}\""
-    unknown: "It seems {0} not in my database yet!"
-    rank: "Only regulars can use this command, {0.displayName}."
-    syntax: "Proper syntax: !quote User Some text here."
-
-raffle:
-    winner: "{0}, winner is you!"
-    noWinner: "There was no valid users found for the raffle."
-
-recite:
-    normal: "\"{0.quote}\" -{0.author}, {1} (Added by {0.added})"
-    noQuotes: "There are no quotes in my database yet!"
-
-commands:
-    logCommandFails: false
-    notFound: "{1.displayName} tried to run the command '{0}' but it doesn't exist"
-
-    notExist: "The custom command by name '{0}' does not exist"
-    create:
-        success: "Command '{0}' was successfully added"
-        fail: "Command '{0}' could not be added"
-        exist: "Command '{0}' already exists"
-    edit:
-        success: "Command '{0}' was successfully edited"
-        fail: "Command '{0}' could not be edited"
-    remove:
-        success: "Command '{0}' was successfully removed"
-        fail: "Command '{0}' could not be removed"
-    rename:
-        success: "Command '{0}' was successfully renamed to '{1}'"
-        fail: "Command '{0}' could not be renamed"
+    recite:
+        normal: "\"{0.quote}\" -{0.author}, {1} (Added by {0.added})"
+        noQuotes: "There are no quotes in my database yet!"
