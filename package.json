@@ -2,8 +2,12 @@
     "name": "Omnibot",
     "version": "1.0.0",
     "description": "A highly configurable twitch chat bot made with Node.js & tmi.js.",
-    "main": "lib/bot.js",
     "repository": "https://github.com/vaughnroyko/Omnibot",
+    "license": "MIT",
+
+    "engines": {
+        "node" : ">=5.6.0"
+    },
     "dependencies": {
         "tmi.js": "0.0.21",
         "mongoose": ">=3.8.1",
@@ -15,7 +19,5 @@
         "weaving": ">=0.4.0",
         "weaving-chalk": "*"
     },
-    "engines": {
-        "node" : ">=5.6.0"
-    }
+    "main": "lib/bot.js"
 }
