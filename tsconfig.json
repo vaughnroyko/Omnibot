@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "declaration": true,
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "outDir": "out",
+        "sourceMap": true
+    },
+    "exclude": [
+        "typings",
+        "out"
+    ]
+}
