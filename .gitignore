@@ -11,5 +11,6 @@ options/*
 import
 lib/debug.cson
 install/patches/backup
-lib/js
+old
+out
 .vscode

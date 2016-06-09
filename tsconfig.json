@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es5",
+        "target": "es6",
         "module": "commonjs",
         "declaration": true,
         "noImplicitAny": true,
@@ -11,6 +11,7 @@
     },
     "exclude": [
         "typings",
-        "out"
+        "out",
+        "node_modules"
     ]
 }
