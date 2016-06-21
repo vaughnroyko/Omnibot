@@ -1,11 +1,11 @@
+/// <reference path="../node_modules/weaving/out/typings/String-all.d.ts" />
 
 // variable pre-initialization (so it doesn't error when trying to use them before they're defined)
-import { Process, Arguments, Console, Timeline } from "consolemate";
+import { Process, Arguments, Timeline } from "consolemate";
 
-import { Logger } from "./core/Logger";
-var logger: Logger;
-import { Database } from "./util/database";
-var database: Database;
+import { Bot } from "./core/Bot";
+var bot: Bot;
+
 import { Options as OptionManager } from "./util/options";
 var optionManager: OptionManager;
 
@@ -15,9 +15,9 @@ var optionManager: OptionManager;
 Process.on.error("logger", function (err: Error) {
     var success = false;
     try {
-        if (typeof logger == "object") {
-            logger.timestamp = false;
-            logger.logTo("error.log", err.stack);
+        if (typeof bot.logger == "object") {
+            bot.logger.timestamp = false;
+            bot.logger.logTo("error.log", err.stack);
             success = true;
         }
     } catch (_e) {}
@@ -29,8 +29,6 @@ Process.on.error("logger", function (err: Error) {
 });
 
 
-Console.input.advanced(true);
-Console.clear();
 
 
 var argReader = new Arguments.Reader;
@@ -40,15 +38,24 @@ argReader.flagAliases = {
 };
 argReader.throwIfArgumentsIncorrect = true;
 
-var { options, flags, args } = argReader.read();
-
-Console.logLine(options, flags, args);
+var options: any;
+var { options: o, flags, args } = argReader.read();
+options = o;
 
 // load needed modules
 
 //var _ = require("underscore-plus");
 import {weaving, StringUtils} from "weaving";
 weaving.library.add(require("weaving-chalk"));
+
+var applyPrototypes = function (obj: any, target: Function) {
+    for (var fname in obj) {
+        obj[fname].applyTo(fname, target);
+    }
+}
+applyPrototypes(StringUtils, String);
+applyPrototypes(StringUtils, String);
+applyPrototypes({ weave: weaving.weave, weaveIgnore: weaving.weaveIgnore }, String);
 
 // load other options
 
@@ -75,14 +82,6 @@ for (var i = 0; i < options.core.blacklist.length; i++)
 
 options.core.blacklist.push(options.twitch.channel, options.twitch.identity.username);
 
+bot = new Bot(options);
 
-// load core library
-
-database = new Database(options.channel);
-logger = new Logger("logs");
-
-
-Console.input.enable();
-Console.onLine = function (line: string) {
-    
-};
+bot.connect();

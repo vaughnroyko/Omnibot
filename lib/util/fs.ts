@@ -13,7 +13,7 @@ fs.tryReadSync = function () {
 };
 
 fs.moveSync = function (source: string, dest: string) {
-    return sync.wait(fs, "move", [source, dest, undefined, sync.defer()]);
+    return sync.wait(fs, "move", [source, dest, {}, sync.defer()]);
 };
 
 export = fs;

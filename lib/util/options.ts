@@ -1,9 +1,7 @@
 import path = require("path");
-
-var season = require("season");
-var _ = require("underscore-plus");
-
 import fs = require("./fs");
+
+var season: any, _: any;
 
 export type OptionsObject = { [key: string]: { [key: string]: any } };
 
@@ -25,7 +23,9 @@ export class Options {
     private _folder: string;
 
     constructor (folder: string) {
-        this._folder = folder + "/";
+        if (!season) season = require("season");
+        if (!_) _ = require("underscore-plus");
+        this._folder = folder = folder + "/";
         this._list = fs.readdirSync(folder + "defaults"), // list of all default option files
         this._defaults = loadOptions(folder + "defaults", this._list); // default options
     }

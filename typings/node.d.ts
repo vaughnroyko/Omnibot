@@ -14,6 +14,9 @@
 interface Error {
     stack?: string;
 }
+interface Array<T> {
+    includes(searchElement: any, fromIndex?: number): boolean;
+}
 
 
 // compat for TypeScript 1.8

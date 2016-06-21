@@ -41,16 +41,14 @@ export class Logger {
             } while (i++ < max);
             if (i > 0) {
                 if (i > max) throw err;
-                console.log("Momentary file issue, but was resolved. " + i + " (Disregard)");
+                Console.logLine("Momentary file issue, but was resolved. " + i + " (Disregard)");
             }
         }
     }
 
-    log () {
+    log (...what: any[]) {
         if (typeof this.selected == "string") {
-            var args = Array.prototype.slice.call(arguments);
-            args.unshift(this.selected);
-            this.logTo.apply(this, args);
+            this.logTo(this.selected, ...what);
         }
     }
     logTo (selection: string, ...args: any[]) {
@@ -83,7 +81,7 @@ export class Logger {
         "October", "November", "December"
     ];
     static getTimestamp (time = new Date(), format = "{year}-{month}-{date} {hour}:{minute}:{second}"): string {
-        var hr = String(time.getHours().toString().padLeft(2, '0'));
+        var hr = new String(time.getHours().toString().padLeft(2, '0'));
         Object.defineProperty(hr, "short", { value: (time.getHours() - 1) % 12 + 1});
         return format.weave({
             year: time.getFullYear(),

@@ -63,15 +63,14 @@ module mongo {
 
 export class Database {
     tables: { [key: string]: Table };
-    constructor (public name: string) {}
+    constructor (public name: string, public path: string, public connection: Object) {}
 
     table (name: string, schema: Object) {
         if (typeof name != "string" || typeof schema != "object") throw new TypeError;
         return this.tables[name] = new Table(this.name + "." + name, schema);
     }
 
-    static connect (path: string, connection: Object) {
-        path = path, connection = connection;
-        sync.wait(mongoose, 'connect', [mongo.path, mongo.connection, sync.defer()]);
+    connect () {
+        sync.wait(mongoose, 'connect', [this.path, this.connection, sync.defer()]);
     }
 }
