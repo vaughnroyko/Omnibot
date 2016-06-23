@@ -1,13 +1,20 @@
-import { Console } from "consolemate";
+import { Console, Process } from "consolemate";
+
 Console.connect();
 Console.input.advanced(true);
 Console.clear();
 
+console.log = Console.logLine;
+
 import { Logger } from "./Logger";
 import { Database } from "../util/database";
+Database.init();
 
 import { Client, Options as ClientOptions } from "./Client";
 import { weaving } from "weaving";
+
+import { Chatters, Chatter } from "./Chatters";
+import { Commands } from "./Commands";
 
 export class Bot {
     public client: Client;
@@ -15,11 +22,22 @@ export class Bot {
     public logger: Logger;
     public channel: string;
     public identity: string;
-    public say: (...what: any[]) => void;
+    public chatters: Chatters;
+    public commands: Commands;
 
     constructor (public options: any) {
         this.channel = options.twitch.channel;
         this.identity = options.twitch.identity.username;
+    }
+
+    say (...what: any[]) {
+        this.client.say(...what);
+    }
+    stop () {
+        Process.exit();
+    }
+    restart () {
+        Process.exit(4);
     }
 
     connect () {
@@ -48,30 +66,25 @@ export class Bot {
 
         this.client = new Client({
             channel: this.options.twitch.channel,
-            identity: this.options.twitch.identity.username
+            identity: this.options.twitch.identity
         });
 
-        this.client.connect(function () {
-            Console.input.enable();
-            Console.logLine("Hello! I'm Omnibot!");
-            Console.onLine = function (line: string) {
-                Console.logLine("I just recieved '" + line + "' from the command line!");
-            };
+        this.chatters = new Chatters(this.database);
+        this.client.on("join", this.chatters.join.bind(this.chatters));
+        this.client.on("part", this.chatters.part.bind(this.chatters));
+        this.commands = new Commands({
+            say: this.say.bind(this),
+            stop: this.stop.bind(this),
+            restart: this.restart.bind(this)
         });
-
-        this.say = this.client.say.bind(this.client);
-
-        /*this.chatters = require("./core/chatters.js")(this);
-        this.commands = require("./core/commands.js")(this);*/
-
 
         this.client.on("chat", (userData: any, message: string) => {
-            //var chatter = chatters.get(userData);
-            this.logger.log(userData['display-name'] + ": " + message);
+            var chatter = this.chatters.get(userData);
+            this.logger.log(chatter.displayName + ": " + message);
             if (message[0] == "!") {
                 // TODO @stats -> command
-                //var result = commands.call(message.slice(1), chatter);
-                /*if (!result.success) {
+                var result = this.commands.call(message.slice(1), chatter);
+                if (!result.success) {
                     // TODO @stats -> command failure
                     switch (this.options.output.commandFails) {
                         case "whisper": {
@@ -83,7 +96,7 @@ export class Bot {
                             break;
                         }
                     }
-                }*/
+                }
             } else {
                 // TODO @stats -> message
             }
@@ -95,5 +108,11 @@ export class Bot {
         this.logger.log("Connecting to twitch...");
         this.client.connectSync();
         this.logger.log("Connected! Channel: #" + this.channel);
+        
+        Console.input.enable();
+        Console.onLine = function (line: string) 
+        {
+            Console.logLine("I just recieved '" + line + "' from the command line!");
+        };
     }
 }

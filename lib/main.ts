@@ -2,6 +2,7 @@
 
 // variable pre-initialization (so it doesn't error when trying to use them before they're defined)
 import { Process, Arguments, Timeline } from "consolemate";
+Process.connect();
 
 import { Bot } from "./core/Bot";
 var bot: Bot;

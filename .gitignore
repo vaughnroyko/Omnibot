@@ -14,3 +14,6 @@ install/patches/backup
 old
 out
 .vscode
+omnibot.exe
+omnibot.visualelementsmanifest.xml
+tile.png

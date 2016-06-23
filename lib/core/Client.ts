@@ -38,13 +38,12 @@ export class Client {
         var _this = this;
 
         for (var i = 0; i < events.length; i++) (function (event: string) {
-            _this.twitch.on(event, function () {
+            _this.twitch.on(event, function (...args: any[]) {
                 var eventCallbacks = _this.events[event];
                 if (Array.isArray(eventCallbacks)) {
-                    for (var i = 0; i < eventCallbacks.length; i++) {
-                        if (eventCallbacks[i]) eventCallbacks[i].apply(null, Array.prototype.slice.apply(arguments, [1]));
-                    }
-                } else if (typeof eventCallbacks == "function") eventCallbacks.apply(null, arguments);
+                    for (var eventCallback of eventCallbacks) if (eventCallback) 
+                        eventCallback(...args.slice(1));
+                } else if (typeof eventCallbacks == "function") eventCallbacks(...args);
             });
         })(events[i]);
     }
@@ -57,7 +56,6 @@ export class Client {
             var index = this.events[event].length;
             (this.events[event] as Function[]).push(callback);
             (callback as any).cancel = (): any => (this.events[event] as Function[])[index] = undefined;
-            (callback as any).cancelAfterCall = (): any => (this.events[event] as Function[])[index] = undefined;
             return callback;
         }
     }

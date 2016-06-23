@@ -3,33 +3,20 @@
 import mongoose = require("mongoose");
 var sync = require("synchronicity");
 
-declare module "mongoose" {
-    export module Document {
-        export var prototype: any;
-    }
+export interface Document extends mongoose.Document {
+    [key: string]: any;
+    saveSync(): void;
+    edit(data: any, callback?: Function): void;
 }
-
-mongoose.Document.prototype.edit = function (data: any, callback: Function) {
-    this.constructor.update(
-        {_id: this._id},
-        data,
-        function () {
-            if (typeof callback == "function") callback.apply(null, arguments);
-        }
-    );
-};
-mongoose.Document.prototype.saveSync = function () {
-    return sync.wait(this, "save");
-};
 
 export type resultCallback = (result: any) => void;
 export class Query {
 
     constructor (public table: Table, public conditions: Object) {}
 
-    find (callback: resultCallback): mongoose.Promise<mongoose.Document[]>;
-    find (limit: number, callback: resultCallback): mongoose.Promise<mongoose.Document[]>;
-    find (limit: number | resultCallback, callback?: resultCallback): mongoose.Promise<mongoose.Document[]> {
+    find (callback: resultCallback): mongoose.Promise<Document[]>;
+    find (limit: number, callback: resultCallback): mongoose.Promise<Document[]>;
+    find (limit: number | resultCallback, callback?: resultCallback): mongoose.Promise<Document[]> {
         var q = this.table.row.find(this.conditions);
         if (typeof limit == "function") callback = limit as resultCallback;
         else if (typeof limit == "number") q = q.limit(limit as number);
@@ -45,10 +32,10 @@ export class Query {
 
 export class Table {
 
-    row: mongoose.Model<mongoose.Document>;
+    row: mongoose.Model<Document>;
 
     constructor (private name: string, schema: Object) {
-        this.row = mongoose.model(name, new mongoose.Schema(schema));
+        this.row = mongoose.model(name, new mongoose.Schema(schema)) as any;
     }
     
     where (conditions: Object) {
@@ -56,14 +43,11 @@ export class Table {
     }
 }
 
-module mongo {
-    export var path: string;
-    export var connection: Object;
-}
-
 export class Database {
     tables: { [key: string]: Table };
-    constructor (public name: string, public path: string, public connection: Object) {}
+    constructor (public name: string, public path: string, public connection: Object) {
+        this.tables = {};
+    }
 
     table (name: string, schema: Object) {
         if (typeof name != "string" || typeof schema != "object") throw new TypeError;
@@ -72,5 +56,22 @@ export class Database {
 
     connect () {
         sync.wait(mongoose, 'connect', [this.path, this.connection, sync.defer()]);
+    }
+}
+export module Database {
+    export function init () {
+        var m = mongoose as any;
+        m.Document.prototype.edit = function (data: any, callback?: Function) {
+            this.constructor.update(
+                {_id: this._id},
+                data,
+                function (...args: any[]) {
+                    if (typeof callback == "function") callback(...args);
+                }
+            );
+        };
+        m.Document.prototype.saveSync = function () {
+            return sync.wait(this, "save");
+        };
     }
 }
