@@ -16,6 +16,8 @@ import { weaving } from "weaving";
 import { Chatters, Chatter } from "./Chatters";
 import { Commands } from "./Commands";
 
+import { Plugins, Plugin } from "./Plugins";
+
 export class Bot {
     public client: Client;
     public database: Database;
@@ -24,6 +26,7 @@ export class Bot {
     public identity: string;
     public chatters: Chatters;
     public commands: Commands;
+    public plugins: Plugin[];
 
     constructor (public options: any) {
         this.channel = options.twitch.channel;
@@ -49,10 +52,10 @@ export class Bot {
         this.logger.timestamp = true;
         this.logger.timestampFormat = this.options.output.timestamp;
 
-        // if we can't connect to the database, there's no point in going any farther.
         try {
             this.database.connect();
         } catch (err) {
+            // if we can't connect to the database, there's no point in going any farther
             this.logger.timestamp = false;
             this.logger.log(
                 (err.name == "MongoError" && err.message.startsWith("connect ECONNREFUSED") ? (
@@ -65,21 +68,28 @@ export class Bot {
         }
 
         this.client = new Client({
-            channel: this.options.twitch.channel,
+            channel: this.channel,
             identity: this.options.twitch.identity
         });
 
-        this.chatters = new Chatters(this.database);
+        this.chatters = new Chatters(this.database, this.channel, this.identity);
         this.client.on("join", this.chatters.join.bind(this.chatters));
         this.client.on("part", this.chatters.part.bind(this.chatters));
+
         this.commands = new Commands({
             say: this.say.bind(this),
             stop: this.stop.bind(this),
-            restart: this.restart.bind(this)
+            restart: this.restart.bind(this),
+            chatters: this.chatters
         });
 
+        this.plugins = Plugins.load("plugins");
+        for (var plugin of this.plugins) {
+            this.commands.add(plugin.commandLibrary);
+        }
+
         this.client.on("chat", (userData: any, message: string) => {
-            var chatter = this.chatters.get(userData);
+            var chatter = this.chatters.find(userData);
             this.logger.log(chatter.displayName + ": " + message);
             if (message[0] == "!") {
                 // TODO @stats -> command

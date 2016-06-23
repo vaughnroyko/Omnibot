@@ -1,4 +1,4 @@
-enum ranks {
+enum Rank {
     new = 0,
     user = 0,
     regular = 1,
@@ -11,4 +11,4 @@ enum ranks {
     broadcaster = 4,
     bot = 5,
 }
-export = ranks;
+export = Rank;

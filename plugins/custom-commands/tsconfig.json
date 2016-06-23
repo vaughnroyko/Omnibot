@@ -10,9 +10,6 @@
         "sourceMap": true
     },
     "exclude": [
-        "typings",
-        "out",
-        "node_modules",
-        "plugins"
+        "out"
     ]
 }
