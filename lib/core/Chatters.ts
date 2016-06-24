@@ -22,11 +22,13 @@ export class Chatters {
     }
     get (data: string | UserData): Chatter {
         var name: string, rank = Rank.new;
+        
         if (typeof data == "object") {
             var userData = data as UserData;
             name = userData.name || userData["display-name"];
             if ("mod" in userData) rank = userData.mod ? Rank.mod : Rank.new;
         } else if (typeof data == "string") name = data as string;
+        name = name.toLowerCase();
 
         var result = this.collection.where({ name: name }).findOne();
 
