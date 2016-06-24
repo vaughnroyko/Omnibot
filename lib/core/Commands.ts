@@ -2,6 +2,7 @@ var _ = require("underscore-plus");
 
 import Ranks = require("./Rank");
 import { Chatter, Chatters } from "./Chatters";
+import { Database } from "typego";
 
 export class CommandFailure {
     constructor(public expected: Argument, public given?: string) {}
@@ -25,7 +26,7 @@ class ArgumentMatcher {
                 toPush = parseFloat(given);
                 if (isNaN(toPush)) return new CommandFailure(expected, given);
             } else if (expected.type == "user") {
-                toPush = this.chatters.find(given);
+                toPush = this.chatters.get(given);
                 if (!toPush) return new CommandFailure(expected, given);
             } else if (expected.type == "string") toPush = given;
             if (consumeRemaining) result[result.length - 1].push(toPush); else result.push(toPush);
@@ -57,6 +58,7 @@ export interface CommandAPI {
     stop(): void;
     restart(): void;
     chatters: Chatters;
+    database: Database;
 }
 
 export module Library {

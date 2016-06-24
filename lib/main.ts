@@ -1,4 +1,4 @@
-/// <reference path="../node_modules/weaving/out/typings/String-all.d.ts" />
+/// <reference path="../node_modules/weaving/typings/String-all.d.ts" />
 
 // variable pre-initialization (so it doesn't error when trying to use them before they're defined)
 import { Process, Arguments, Timeline } from "consolemate";
@@ -46,7 +46,9 @@ options = o;
 // load needed modules
 
 //var _ = require("underscore-plus");
-import {weaving, StringUtils} from "weaving";
+import weaving = require("weaving");
+var StringUtils = weaving.StringUtils;
+
 weaving.library.add(require("weaving-chalk"));
 
 var applyPrototypes = function (obj: any, target: Function) {
@@ -66,8 +68,8 @@ options = (
 );
 
 class ConfigError extends weaving.Error {
-    protected _name = 'ConfigError';
-    protected _message = "Please {1?correct:fill out} the file '{0}'";
+    name = 'ConfigError';
+    message = "Please {1?correct:fill out} the file '{0}'";
 }
 
 if ([options.twitch.identity.username, options.twitch.identity.password, options.twitch.channel].includes(""))

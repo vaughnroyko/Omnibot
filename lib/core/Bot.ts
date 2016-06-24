@@ -1,32 +1,35 @@
 import { Console, Process } from "consolemate";
 
-Console.connect();
+Console.init();
 Console.input.advanced(true);
 Console.clear();
 
 console.log = Console.logLine;
 
 import { Logger } from "./Logger";
-import { Database } from "../util/database";
-Database.init();
+import { Database, Collection } from "typego";
 
 import { Client, Options as ClientOptions } from "./Client";
-import { weaving } from "weaving";
+import weaving = require("weaving");
 
 import { Chatters, Chatter } from "./Chatters";
 import { Commands } from "./Commands";
 
 import { Plugins, Plugin } from "./Plugins";
 
+var sync = require("synchronicity");
+
+var databaseVersion = "1";
+
 export class Bot {
     public client: Client;
-    public database: Database;
     public logger: Logger;
     public channel: string;
     public identity: string;
     public chatters: Chatters;
     public commands: Commands;
     public plugins: Plugin[];
+    public database: Database;
 
     constructor (public options: any) {
         this.channel = options.twitch.channel;
@@ -45,7 +48,8 @@ export class Bot {
 
     connect () {
         // load core library
-        this.database = new Database("omnibot.v1#" + this.channel, this.options.mongo.path, this.options.mongo.connection);
+
+        //this.database = new Database("omnibot.v1#" + this.channel, this.options.mongo.path, this.options.mongo.connection);
         this.logger = new Logger("logs");
 
         this.logger.selected = "bot.log";
@@ -53,7 +57,7 @@ export class Bot {
         this.logger.timestampFormat = this.options.output.timestamp;
 
         try {
-            this.database.connect();
+            this.database = new Database(this.options.mongo.path + "V" + databaseVersion + "#" + this.channel);
         } catch (err) {
             // if we can't connect to the database, there's no point in going any farther
             this.logger.timestamp = false;
@@ -64,7 +68,7 @@ export class Bot {
                     "{#red:{name}: {message}\n{1}}"
                 )).weave(err, weaving.trimError(err.stack))
             );
-            process.exit(1);
+            //process.exit(1);
         }
 
         this.client = new Client({
@@ -80,7 +84,8 @@ export class Bot {
             say: this.say.bind(this),
             stop: this.stop.bind(this),
             restart: this.restart.bind(this),
-            chatters: this.chatters
+            chatters: this.chatters,
+            database: this.database
         });
 
         this.plugins = Plugins.load("plugins");
@@ -89,7 +94,7 @@ export class Bot {
         }
 
         this.client.on("chat", (userData: any, message: string) => {
-            var chatter = this.chatters.find(userData);
+            var chatter = this.chatters.get(userData);
             this.logger.log(chatter.displayName + ": " + message);
             if (message[0] == "!") {
                 // TODO @stats -> command

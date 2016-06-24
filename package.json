@@ -13,16 +13,16 @@
         "node" : ">=6.2.0"
     },
     "dependencies": {
-        "consolemate": ">=0.1.0",
-        "tmi.js": ">=1.0.0",
-        "mongoose": ">=3.8.1",
+        "consolemate": "0.1.1",
+        "tmi.js": "1.0.0",
         "request": "*",
         "fs-extra": "*",
         "underscore-plus": "*",
         "season": "*",
-        "synchronicity": ">=0.0.3",
-        "weaving": ">=0.5.0",
-        "weaving-chalk": "*"
+        "synchronicity": "0.0.4",
+        "weaving": "0.5.1",
+        "weaving-chalk": "*",
+        "typego": "0.0.4"
     },
     "main": "out/main.js"
 }

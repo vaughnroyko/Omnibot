@@ -1,51 +1,61 @@
-import { Query, Table, Database, Document } from "../util/database";
+import { Database, Collection, Schema, Document } from "typego";
 
 import Rank = require("./Rank");
 
+export interface UserData {
+    name: string;
+    "display-name"?: string;
+    mod?: boolean;
+}
+
 export class Chatters {
-    private table: Table;
+    private collection: Collection<Chatter>;
     constructor(private database: Database, private channel: string, private botName: string) {
-        this.table = database.table("chatters", {
-            name: String,
-            displayName: String,
-            rank: Number,
-            chatting: Boolean,
-            firstJoin: Number,
-            time: Number
+        this.collection = database.collection<Chatter>("chatters", {
+            name: { type: String, unique: true },
+            displayName: { type: String, fillWith: "name" },
+            rank: { type: Number, default: Rank.new },
+            chatting: { type: Boolean, default: false },
+            firstJoin: { type: Date, generator: () => Date.now() },
+            time: { type: Number, default: 0 }
         });
     }
-    find (data: Chatter | string | any) {
-        var result: Chatter;
+    get (data: string | UserData): Chatter {
+        var name: string, rank = Rank.new;
         if (typeof data == "object") {
-            if (data instanceof Chatter) result = data;
-            else result = new Chatter(data["name"] || data["display-name"], data.mod ? 2 : 0);
-        }
-        if (typeof data == "string") result = new Chatter(data, Rank["new"]);
+            var userData = data as UserData;
+            name = userData.name || userData["display-name"];
+            if ("mod" in userData) rank = userData.mod ? Rank.mod : Rank.new;
+        } else if (typeof data == "string") name = data as string;
+
+        var result = this.collection.where({ name: name }).findOne();
+
+        if (name == this.botName) rank = Rank.bot;
+        else if (name == this.channel) rank = Rank.channel;
+
         if (result) {
-            result.load(this.table);
-
-            if (result.name == this.botName) result.rank = Rank.bot;
-            else if (result.name == this.channel) result.rank = Rank.channel;
-            if (typeof data == "object" && "display-name" in data) result.displayName = data["display-name"];
-
-            result.save(this.table);
-            return result;
+            if (rank != result.rank) result.rank = rank, result.save();
+        } else if (!result) {
+            result = this.collection.insert({
+                name: name,
+                rank: rank
+            });
         }
-    }
-    join (chatter: Chatter | string | any) {
-        chatter = this.find(chatter);
-        chatter.chatting = true;
-        chatter.save(this.table);
-    } 
-    part (chatter: Chatter | string | any) {
-        chatter = this.find(chatter);
-        chatter.chatting = true;
-        chatter.save(this.table);
-    } 
-    list () {
-        var chatters = this.table.where({chatting: true}).findSync(), result: Chatter[] = [];
-        for (var chatter of chatters) result.push(this.find(chatter));
+
         return result;
+    }
+    join (chatter: string | UserData) {
+        var ch = this.get(chatter);
+        ch.chatting = true;
+        ch.save();
+    }
+    part (chatter: string | UserData) {
+        var ch = this.get(chatter);
+        ch.chatting = false;
+        ch.save();
+    }
+    list () {
+        return this.collection.where({chatting: true}).find();
     }
     static ranks = Rank;
     static getRank (rank: string | number) {
@@ -56,19 +66,29 @@ export class Chatters {
     }
 }
 
+export class Chatter extends Document {
+    public name: string;
+    public rank: number;
+    public displayName: string;
+    public chatting: boolean;
+    public time: number;
+    public firstJoin: Date;
+}
+
+/*
 export class Chatter {
 
     public name: string;
     public rank: number;
     public displayName: string;
     public chatting: boolean;
-    public stored: Document;
     public time: Date;
 
     constructor(name: string, rank?: string | number) {
-        /*if (typeof name == "object" && name.constructor.name == "model") {
-            this.stored = name;
-        } else {*/
+        super();
+        //if (typeof name == "object" && name.constructor.name == "model") {
+        //    this.stored = name;
+        //} else {
         this.name = name.toLowerCase(), this.displayName = this.name;
         this.rank = typeof rank == "string" && rank in Rank ? (Rank as any)[rank] : typeof rank == "number" ? rank : Rank.new;
         //}
@@ -107,4 +127,4 @@ export class Chatter {
         }
         return true;
     }
-}
+}*/

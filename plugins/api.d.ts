@@ -1,3 +1,4 @@
+
 declare interface Chatters {
     new(name: string, rank: string | number): Chatter;
     get(data: Chatter | string | any): Chatter;
@@ -38,4 +39,6 @@ declare interface CommandAPI {
     say(...what: any[]): void;
     stop(): void;
     restart(): void;
+    chatters: Chatters;
+    database: Database;
 }
