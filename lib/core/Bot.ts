@@ -7,15 +7,17 @@ Console.clear();
 console.log = Console.logLine;
 
 import { Logger } from "./Logger";
+
 import { Database, Collection } from "typego";
+require("typego").init();
 
 import { Client, Options as ClientOptions } from "./Client";
 import weaving = require("weaving");
 
-import { Chatters, Chatter } from "./Chatters";
+import { Chatters, Chatter, UserData } from "./Chatters";
 import { Commands } from "./Commands";
 
-import { Plugins, Plugin } from "./Plugins";
+import { Plugins, InternalPlugin as Plugin } from "./Plugins";
 
 var sync = require("synchronicity");
 
@@ -93,7 +95,7 @@ export class Bot {
             this.commands.add(plugin.commandLibrary);
         }
 
-        this.client.on("chat", (userData: any, message: string) => {
+        this.client.on("chat", (userData: UserData, message: string) => {
             var chatter = this.chatters.get(userData);
             this.logger.log(chatter.displayName + ": " + message);
             if (message[0] == "!") {
@@ -116,7 +118,7 @@ export class Bot {
                 // TODO @stats -> message
             }
         });
-        this.client.on("action", (userData: any, message: string) => {
+        this.client.on("action", (userData: UserData, message: string) => {
             this.logger.log(userData['display-name'] + " " + message);
         });
 
@@ -125,9 +127,12 @@ export class Bot {
         this.logger.log("Connected! Channel: #" + this.channel);
         
         Console.input.enable();
-        Console.onLine = function (line: string) 
-        {
-            Console.logLine("I just recieved '" + line + "' from the command line!");
-        };
+        Console.onLine = (line: string) => {
+            if (line[0] == "!") {
+                // TODO run commands as bot
+            } else {
+                this.say(line);
+            }
+        }
     }
 }

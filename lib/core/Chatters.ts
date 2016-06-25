@@ -1,6 +1,6 @@
 import { Database, Collection, Schema, Document } from "typego";
 
-import Rank = require("./Rank");
+import Ranks = require("./Ranks");
 
 export interface UserData {
     name: string;
@@ -14,26 +14,26 @@ export class Chatters {
         this.collection = database.collection<Chatter>("chatters", {
             name: { type: String, unique: true },
             displayName: { type: String, fillWith: "name" },
-            rank: { type: Number, default: Rank.new },
+            rank: { type: Number, default: Ranks["new"] },
             chatting: { type: Boolean, default: false },
             firstJoin: { type: Date, generator: () => Date.now() },
             time: { type: Number, default: 0 }
         });
     }
     get (data: string | UserData): Chatter {
-        var name: string, rank = Rank.new;
+        var name: string, rank = Ranks["new"];
         
         if (typeof data == "object") {
             var userData = data as UserData;
             name = userData.name || userData["display-name"];
-            if ("mod" in userData) rank = userData.mod ? Rank.mod : Rank.new;
+            if ("mod" in userData) rank = userData.mod ? Ranks.mod : Ranks["new"];
         } else if (typeof data == "string") name = data as string;
         name = name.toLowerCase();
 
         var result = this.collection.where({ name: name }).findOne();
 
-        if (name == this.botName) rank = Rank.bot;
-        else if (name == this.channel) rank = Rank.channel;
+        if (name == this.botName) rank = Ranks.bot;
+        else if (name == this.channel) rank = Ranks.channel;
 
         if (result) {
             if (rank != result.rank) result.rank = rank, result.save();
@@ -58,13 +58,6 @@ export class Chatters {
     }
     list () {
         return this.collection.where({chatting: true}).find();
-    }
-    static ranks = Rank;
-    static getRank (rank: string | number) {
-        var result: number;
-        if (typeof rank == "string" && rank in Rank) result = (Rank as any)[rank];
-        if (typeof rank != "number") return Rank.new;
-        return Math.clamp(Math.floor(result), Rank.new, Rank.bot);
     }
 }
 

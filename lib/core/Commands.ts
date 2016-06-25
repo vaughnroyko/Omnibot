@@ -1,6 +1,6 @@
 var _ = require("underscore-plus");
 
-import Ranks = require("./Rank");
+import Ranks = require("./Ranks");
 import { Chatter, Chatters } from "./Chatters";
 import { Database } from "typego";
 
@@ -129,11 +129,11 @@ export class Commands {
             if (typeof rank == "object") {
                 var rankMatcher = rank as RankMatcher;
                 if (
-                    ("min" in rankMatcher && chatter.rank < Chatters.getRank(rankMatcher.min)) ||
-                    ("max" in rankMatcher && chatter.rank > Chatters.getRank(rankMatcher.max))
+                    ("min" in rankMatcher && chatter.rank < Ranks.get(rankMatcher.min)) ||
+                    ("max" in rankMatcher && chatter.rank > Ranks.get(rankMatcher.max))
                 ) return result;
             } else {
-                if (chatter.rank < Chatters.getRank(rank as string | number)) return result;
+                if (chatter.rank < Ranks.get(rank as any)) return result;
             }
         }
         return { success: true, result: command.call(this.api, ...args) };

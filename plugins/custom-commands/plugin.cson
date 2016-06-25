@@ -1,1 +1,2 @@
-commandLibraries: ["out/commands.js"]
+name: "custom-commands"
+main: "out/commands.js"
