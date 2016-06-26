@@ -14,39 +14,20 @@ var events = [
     "timeout", "unhost", "unmod"
 ];
 
-export interface Options {
-    identity: string;
+export interface ClientOptions {
     channel: string;
+    identity: {
+        username: string;
+        password: string;    
+    };
 }
 
 export class Client {
-    twitch: any;
-    events: { [key: string]: Function[] | Function };
-    channel: string;
-    username: string;
+    private twitch: any;
+    private channel: string;
+    private username: string;
 
-    constructor(options: Options) {
-        this.events = {},
-        this.twitch = new twitch.client({
-            connection: { reconnect: true },
-            identity: options.identity,
-            channels: [options.channel]
-        }),
-        this.channel = options.channel,
-        this.username = options.identity;
-
-        var _this = this;
-
-        for (var i = 0; i < events.length; i++) (function (event: string) {
-            _this.twitch.on(event, function (...args: any[]) {
-                var eventCallbacks = _this.events[event];
-                if (Array.isArray(eventCallbacks)) {
-                    for (var eventCallback of eventCallbacks) if (eventCallback) 
-                        eventCallback(...args.slice(1));
-                } else if (typeof eventCallbacks == "function") eventCallbacks(...args);
-            });
-        })(events[i]);
-    }
+    events: { [key: string]: Function[] | Function } = {};
 
     on (event: string, callback: Function) {
         event = event.toLowerCase();
@@ -74,16 +55,37 @@ export class Client {
             return callback;
         }
     }
-    connect (callback: Function) {
-        this.when("Connected", callback);
+    connect (options: ClientOptions, callback?: Function) {
+        this.twitch = new twitch.client({
+            connection: { reconnect: true },
+            identity: options.identity,
+            channels: [options.channel]
+        });
+        this.channel = options.channel;
+        this.username = options.identity.username;
+
+        for (var event of events) ((event: string) => {
+            this.twitch.on(event, (...args: any[]) => {
+                var eventCallbacks = this.events[event];
+                if (Array.isArray(eventCallbacks)) {
+                    for (var eventCallback of eventCallbacks) if (eventCallback) 
+                        eventCallback(...args.slice(1));
+                } else if (typeof eventCallbacks == "function") eventCallbacks(...args);
+            });
+        })(event);
+
+        if (callback) this.when("Connected", callback);
         this.twitch.connect();
     }
-    connectSync () {
+    connectSync (options: ClientOptions) {
         var connected = false;
-        this.connect(() => connected = true);
+        this.connect(options, () => connected = true);
         sync.until(() => connected);
     }
     say (...what: any[]) {
         this.twitch.say(this.channel, what.join(" "));
+    }
+    whisper (to: string, ...what: any[]) {
+        this.twitch.whisper(to.toLowerCase(), what.join(" "));
     }
 }

@@ -1,15 +1,15 @@
 var _ = require("underscore-plus");
 
 import Ranks = require("./Ranks");
-import { Chatter, Chatters } from "./Chatters";
-import { Database } from "typego";
+import { Chatter, Chat } from "./Chat";
+import { PluginAPI } from "./PluginAPI";
 
 export class CommandFailure {
     constructor(public expected: Argument, public given?: string) {}
 }
 
 class ArgumentMatcher {
-    constructor (private chatters: Chatters) {}
+    constructor (private chat: Chat) {}
 
     match (expectedArguments: Argument[], givenArguments: string[]): any[] | CommandFailure {
         var result: any[] = [], consumeRemaining: Argument;
@@ -26,7 +26,7 @@ class ArgumentMatcher {
                 toPush = parseFloat(given);
                 if (isNaN(toPush)) return new CommandFailure(expected, given);
             } else if (expected.type == "user") {
-                toPush = this.chatters.get(given);
+                toPush = this.chat.getChatter(given);
                 if (!toPush) return new CommandFailure(expected, given);
             } else if (expected.type == "string") toPush = given;
             if (consumeRemaining) result[result.length - 1].push(toPush); else result.push(toPush);
@@ -48,17 +48,10 @@ export interface Argument {
 export interface Command {
     rank?: Rank | RankMatcher;
     args?: Argument[];
-    call(...args: any[]): void;
+    call(api: PluginAPI, ...args: any[]): void;
 }
 export interface Library {
     [key: string]: Command | Library;
-}
-export interface CommandAPI {
-    say(...what: any[]): void;
-    stop(): void;
-    restart(): void;
-    chatters: Chatters;
-    database: Database;
 }
 
 export module Library {
@@ -77,31 +70,11 @@ export class Commands {
 
     private argumentMatcher: ArgumentMatcher;
 
-    constructor (public api: CommandAPI) {
-        this.argumentMatcher = new ArgumentMatcher(api.chatters);
+    constructor (public api: PluginAPI) {
+        this.argumentMatcher = new ArgumentMatcher(api.chat);
     }
 
-    library: Library = {
-        stop: {
-            rank: "admin",
-            call: function (bot: CommandAPI) {
-                bot.say("Shutting down.. Bye guys... ;-;");
-                bot.stop();
-            }
-        },
-        restart: {
-            rank: "admin",
-            call: function (bot: CommandAPI) {
-                bot.say("brbz");
-                bot.restart();
-            }
-        },
-        noah: {
-            call: function (bot: CommandAPI) {
-                bot.say("wow");
-            }
-        }
-    };
+    library: Library = {};
     add (...lib: Library[]) {
         Library.merge(this.library, ...lib);
     }
@@ -111,7 +84,13 @@ export class Commands {
         var lib = this.library, name: string;
         do {
             name = splitCommand.shift();
-            if (!(name && name in lib)) return result;
+            if (!(name && name in lib)) {
+                if (!name || lib != this.library) return result;
+
+                // command doesn't exist, call api to see if any plugins can handle it
+                lib[name] = this.onUnknownCommand(name);
+                if (!lib[name]) return result;
+            }
             if ("call" in lib[name]) break;
             else lib = lib[name] as Library;
         } while (true);
@@ -136,6 +115,8 @@ export class Commands {
                 if (chatter.rank < Ranks.get(rank as any)) return result;
             }
         }
-        return { success: true, result: command.call(this.api, ...args) };
+        return { success: true, result: command.call(this.api, chatter, ...args) };
     }
+
+    onUnknownCommand (name: string): Command | Library { return; }
 }

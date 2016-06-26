@@ -1,4 +1,7 @@
+import weaving = require("weaving");
 import { Console, Process } from "consolemate";
+import { Database, Collection } from "typego";
+var sync = require("synchronicity");
 
 Console.init();
 Console.input.advanced(true);
@@ -8,38 +11,41 @@ console.log = Console.logLine;
 
 import { Logger } from "./Logger";
 
-import { Database, Collection } from "typego";
-require("typego").init();
-
-import { Client, Options as ClientOptions } from "./Client";
-import weaving = require("weaving");
-
-import { Chatters, Chatter, UserData } from "./Chatters";
+import { Chat, Chatter, UserData, ChatHost } from "./Chat";
 import { Commands } from "./Commands";
 
 import { Plugins, InternalPlugin as Plugin } from "./Plugins";
+import { PluginAPI } from "./PluginAPI";
 
-var sync = require("synchronicity");
+import Ranks = require("./Ranks");
 
 var databaseVersion = "1";
 
-export class Bot {
-    public client: Client;
+export class Bot implements ChatHost {
     public logger: Logger;
     public channel: string;
     public identity: string;
-    public chatters: Chatters;
+    public chat: Chat;
     public commands: Commands;
     public plugins: Plugin[];
     public database: Database;
 
     constructor (public options: any) {
         this.channel = options.twitch.channel;
-        this.identity = options.twitch.identity.username;
+        this.identity = options.twitch.identity;
+
+        this.logger = new Logger("logs");
+
+        this.logger.selected = "bot.log";
+        this.logger.timestamp = true;
+        this.logger.timestampFormat = this.options.output.timestamp;
     }
 
     say (...what: any[]) {
-        this.client.say(...what);
+        this.chat.say(...what);
+    }
+    whisper (to: string, ...what: any[]) {
+        this.chat.whisper(to, ...what);
     }
     stop () {
         Process.exit();
@@ -48,15 +54,27 @@ export class Bot {
         Process.exit(4);
     }
 
-    connect () {
-        // load core library
+    runCommand (user: Chatter, input: string) {
+        // TODO @stats -> command
+        var result = this.commands.call(input, user);
+        if (!result.success) {
+            // TODO @stats -> command failure
+            switch (this.options.output.commandFails) {
+                case "whisper": {
+                    // whisper the failure message to the executing user
+                    break;
+                }
+                case "global": {
+                    // alert the whole chat to the command failure
+                    break;
+                }
+            }
+        }
+    }
 
-        //this.database = new Database("omnibot.v1#" + this.channel, this.options.mongo.path, this.options.mongo.connection);
-        this.logger = new Logger("logs");
+    connect (connectionOptions: { username: string, password: string }) {
 
-        this.logger.selected = "bot.log";
-        this.logger.timestamp = true;
-        this.logger.timestampFormat = this.options.output.timestamp;
+        // connect to the database
 
         try {
             this.database = new Database(this.options.mongo.path + "V" + databaseVersion + "#" + this.channel);
@@ -73,66 +91,83 @@ export class Bot {
             //process.exit(1);
         }
 
-        this.client = new Client({
-            channel: this.channel,
-            identity: this.options.twitch.identity
-        });
 
-        this.chatters = new Chatters(this.database, this.channel, this.identity);
-        this.client.on("join", this.chatters.join.bind(this.chatters));
-        this.client.on("part", this.chatters.part.bind(this.chatters));
+        // connect to twitch 
 
-        this.commands = new Commands({
+        this.chat = new Chat(this);
+
+        this.chat.onChatMessage = (user: Chatter, message: string, isAction: boolean) => {
+            
+            if (message[0] == "!") {
+                this.logger.log(user.displayName + " " + message);
+                
+                this.runCommand(user, message.slice(1));
+            } else {
+                this.logger.log(user.displayName + (isAction ? " " : ": ") + message);
+                // TODO @stats -> message
+            }
+        };
+
+        var api = {
             say: this.say.bind(this),
-            stop: this.stop.bind(this),
-            restart: this.restart.bind(this),
-            chatters: this.chatters,
+            whisper: this.chat.whisper.bind(this.chat),
+            chat: this.chat,
             database: this.database
+        };
+
+        this.commands = new Commands(api);
+        this.commands.add({
+            stop: {
+                rank: Ranks.admin,
+                call: () => {
+                    this.say("Shutting down.. Bye guys... ;-;");
+                    this.stop();
+                }
+            },
+            restart: {
+                rank: Ranks.admin,
+                call: () => {
+                    this.say("brbz");
+                    this.restart();
+                }
+            },
+            noah: {
+                call: () => {
+                    this.say("wow");
+                }
+            }
         });
 
-        this.plugins = Plugins.load("plugins");
+        this.plugins = Plugins.load("plugins", api);
         for (var plugin of this.plugins) {
             this.commands.add(plugin.commandLibrary);
         }
-
-        this.client.on("chat", (userData: UserData, message: string) => {
-            var chatter = this.chatters.get(userData);
-            this.logger.log(chatter.displayName + ": " + message);
-            if (message[0] == "!") {
-                // TODO @stats -> command
-                var result = this.commands.call(message.slice(1), chatter);
-                if (!result.success) {
-                    // TODO @stats -> command failure
-                    switch (this.options.output.commandFails) {
-                        case "whisper": {
-                            // whisper the failure message to the executing user
-                            break;
-                        }
-                        case "global": {
-                            // alert the whole chat to the command failure
-                            break;
-                        }
-                    }
-                }
-            } else {
-                // TODO @stats -> message
+        this.commands.onUnknownCommand = (name: string) => {
+            for (var plugin of this.plugins) {
+                var command = plugin.onUnknownCommand(name);
+                if (command) return command;
             }
-        });
-        this.client.on("action", (userData: UserData, message: string) => {
-            this.logger.log(userData['display-name'] + " " + message);
-        });
+        }
 
         this.logger.log("Connecting to twitch...");
-        this.client.connectSync();
+        this.chat.connect({
+            channel: this.channel,
+            identity: connectionOptions
+        });
         this.logger.log("Connected! Channel: #" + this.channel);
         
         Console.input.enable();
         Console.onLine = (line: string) => {
             if (line[0] == "!") {
-                // TODO run commands as bot
-            } else {
-                this.say(line);
+                return this.runCommand(this.chat.getChatter(this.identity), line.slice(1));
+            } else if (line[0] == "@") {
+                var match = line.match(/^@([a-zA-Z0-9_]+)/);
+                if (match) {
+                    var user = match[1];
+                    return this.whisper(user, line.slice(user.length + 1));
+                }
             }
+            this.say(line);
         }
     }
 }

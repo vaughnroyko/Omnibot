@@ -1,19 +1,19 @@
 import * as typego from "typego";
 
 declare module api {
-    // re-export all of the typego stuff
+    // database stuff (re-exporting from typego)
     export class Database extends typego.Database {}
     export class Document extends typego.Document {}
     export class Collection<T extends Document> extends typego.Collection<T> {}
     export class Query<T extends Document> extends typego.Query<T> {}
     export interface Schema extends typego.Schema {}
 
-    export interface Chatters {
-        new(name: string, rank: string | number): Chatter;
-        get(data: Chatter | string | any): Chatter;
-        join(chatter: Chatter | string | any): void;
-        part(chatter: Chatter | string | any): void;
-        list(): Chatter[];
+    // chatters
+    export interface Chat {
+        getChatter(data: string): Chatter;
+        listChatters(): Chatter[];
+        say(...what: any[]): void;
+        whisper(to: Chatter | string, ...what: any[]): void;
     }
     export interface Chatter {
         name: string;
@@ -24,6 +24,7 @@ declare module api {
         time: Date;
     }
 
+    // api
     export enum Ranks {
         new = 0,
         user = 0,
@@ -37,7 +38,13 @@ declare module api {
         broadcaster = 4,
         bot = 5
     }
+    export interface API {
+        say(...what: any[]): void;
+        chat: Chat;
+        database: Database;
+    }
     
+    // commands
     export interface RankMatcher {
         min?: Ranks;
         max?: Ranks;
@@ -49,28 +56,25 @@ declare module api {
     export interface Command {
         rank?: Ranks | RankMatcher;
         args?: Argument[];
-        call(...args: any[]): void;
+        call(api: API, ...args: any[]): void;
     }
     export interface CommandLibrary {
         [key: string]: Command | CommandLibrary;
     }
-    export interface CommandAPI {
-        say(...what: any[]): void;
-        stop(): void;
-        restart(): void;
-        chatters: Chatters;
-        database: Database;
-    }
+
+    // plugins
     export class Plugin {
         name: string;
         commands: CommandLibrary;
         constructor(name: string);
 
-        onInit (): void;
+        onInit (api: API): void;
         //onClosing (): void;
-        //onCommandCalled (commandName: string): Command | CommandLibrary;
+        onUnknownCommand (api: API, commandName: string): Command | CommandLibrary;
         //onCommandFailed (): void;
         //onChat (user: Chatter, message: string, whisper?: boolean): void;
+
+        [key: string]: any;
     }
 }
 export = api;

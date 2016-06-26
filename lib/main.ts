@@ -1,6 +1,7 @@
 /// <reference path="../node_modules/weaving/typings/String-all.d.ts" />
 
 // variable pre-initialization (so it doesn't error when trying to use them before they're defined)
+
 import { Process, Arguments, Timeline } from "consolemate";
 Process.connect();
 
@@ -30,8 +31,6 @@ Process.on.error("logger", function (err: Error) {
 });
 
 
-
-
 var argReader = new Arguments.Reader;
 argReader.flagAliases = {
     "developer|dev|d": "developer",
@@ -43,9 +42,10 @@ var options: any;
 var { options: o, flags, args } = argReader.read();
 options = o;
 
+
+
 // load needed modules
 
-//var _ = require("underscore-plus");
 import weaving = require("weaving");
 var StringUtils = weaving.StringUtils;
 
@@ -60,6 +60,7 @@ applyPrototypes(StringUtils, String);
 applyPrototypes(StringUtils, String);
 applyPrototypes({ weave: weaving.weave, weaveIgnore: weaving.weaveIgnore }, String);
 
+
 // load other options
 
 optionManager = new OptionManager("options"),
@@ -69,7 +70,7 @@ options = (
 
 class ConfigError extends weaving.Error {
     name = 'ConfigError';
-    message = "Please {1?correct:fill out} the file '{0}'";
+    weavingMessage = "Please {1?correct:fill out} the file '{0}'";
 }
 
 if ([options.twitch.identity.username, options.twitch.identity.password, options.twitch.channel].includes(""))
@@ -85,6 +86,9 @@ for (var i = 0; i < options.core.blacklist.length; i++)
 
 options.core.blacklist.push(options.twitch.channel, options.twitch.identity.username);
 
-bot = new Bot(options);
+// separate the twitch options
+var connectionOptions = options.twitch.identity;
+options.twitch.identity = options.twitch.identity.username;
 
-bot.connect();
+bot = new Bot(options);
+bot.connect(connectionOptions);
