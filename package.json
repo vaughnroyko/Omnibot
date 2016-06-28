@@ -14,15 +14,17 @@
     },
     "dependencies": {
         "consolemate": "0.1.2",
+        "typego": "0.1.1",
         "tmi.js": "1.0.0",
+
         "request": "*",
         "fs-extra": "*",
         "underscore-plus": "*",
         "season": "*",
+        
         "synchronicity": "0.0.4",
         "weaving": "0.5.2",
-        "weaving-chalk": "*",
-        "typego": "0.1.0"
+        "weaving-chalk": "*"
     },
     "main": "out/main.js"
 }

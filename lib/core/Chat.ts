@@ -30,13 +30,22 @@ export class Chat {
             displayName: { type: String, fillWith: "name" },
             rank: { type: Number, default: Ranks["new"] },
             chatting: { type: Boolean, default: false },
-            firstJoin: { type: Date, generator: () => Date.now() },
-            time: { type: Number, default: 0 }
+            joined: { type: Date, generator: () => new Date() },
+            stat_time: { type: Number, default: 0 },
+            stat_messagesToDate: { type: Number, default: 0 },
+            stat_streamsAttended: { type: Number, default: 0 },
+            stat_commandsToDate: { type: Number, default: 0 }
         });
 
         this.client = new Client();
         this.client.on("join", this.join.bind(this));
         this.client.on("part", this.part.bind(this));
+        this.client.on("whisper", (userData: UserData, message: string, self: boolean) => {
+            if (!self) {
+                var chatter = this.getChatter(userData);
+                if (this.onWhisper) this.onWhisper(chatter, message.trim(), true);
+            }
+        });
         
         this.client.on("chat", (userData: UserData, message: string) => {
             var chatter = this.getChatter(userData);
@@ -47,19 +56,6 @@ export class Chat {
             if (this.onChatMessage) this.onChatMessage(chatter, message, true);
         });
     }
-
-    /**
-     * Called when a user joins the chat.
-     */
-    onUserJoin: (user: Chatter) => void;
-    /**
-     * Called when a user leaves the chat.
-     */
-    onUserPart: (user: Chatter) => void;
-    /**
-     * Called when a chat message is recieved.
-     */
-    onChatMessage: (user: Chatter, message: string, isAction: boolean) => void;
 
     /**
      * Connect to the twitch chat.
@@ -88,8 +84,9 @@ export class Chat {
         if (name == this.username.toLowerCase()) rank = Ranks.bot;
         else if (name == this.channel.toLowerCase()) rank = Ranks.channel;
 
-        if (result) {
-            if (rank != result.rank) result.rank = rank, result.save();
+        if (result && (result.verify() || result.repair())) {
+            if (rank != result.rank) result.rank = rank;
+            result.save();
         } else if (!result) {
             result = this.chatters.insert({
                 name: name,
@@ -137,7 +134,30 @@ export class Chat {
     whisper (to: Chatter | string, ...what: any[]) {
         var user: string = typeof to == "string" ? to as string : (to as Chatter).name;
         this.client.whisper(user, ...what);
+        if (this.onWhisper)
+            this.onWhisper(typeof to == "string" ? this.getChatter(to) : to as Chatter, what.join(" ").trim(), false);
     }
+
+
+    // events
+
+    /**
+     * Called when a user joins the chat.
+     */
+    onUserJoin: (user: Chatter) => void;
+    /**
+     * Called when a user leaves the chat.
+     */
+    onUserPart: (user: Chatter) => void;
+    /**
+     * Called when a chat message is recieved.
+     */
+    onChatMessage: (user: Chatter, message: string, isAction: boolean) => void;
+    /**
+     * Called when a whisper is sent or recieved.
+     */
+    onWhisper: (user: Chatter, message: string, isReceived: boolean) => void;
+
 }
 
 export class Chatter extends Document {
@@ -145,6 +165,9 @@ export class Chatter extends Document {
     public rank: number;
     public displayName: string;
     public chatting: boolean;
-    public time: number;
-    public firstJoin: Date;
+    public joined: Date;
+    public stat_time: number;
+    public stat_messagesToDate: number;
+    public stat_streamsAttended: number;
+    public stat_commandsToDate: number;
 }

@@ -9,7 +9,7 @@ class CustomCommand extends Document {
     public name: string;
     public rank: number;
     public content: string;
-    public stat_callCount: number;
+    public stat_callsToDate: number;
     public stat_lastCall: Date;
 
     private command: Command;
@@ -17,9 +17,9 @@ class CustomCommand extends Document {
         if (!customCommand.command) customCommand.command = {
             rank: { min: customCommand.rank },
             call: (api: API) => {
-                api.say(customCommand.content);
+                api.chat.say(customCommand.content);
                 customCommand.stat_lastCall = new Date;
-                customCommand.stat_callCount++;
+                customCommand.stat_callsToDate++;
                 customCommand.save();
             }
         }
@@ -38,8 +38,9 @@ class CustomCommands extends Plugin {
             name: { type: String, unique: true },
             content: String,
             rank: { type: Number, default: Ranks["new"] },
-            stat_callCount: { type: Number, default: 0 },
-            stat_lastCall: { type: Date, default: undefined }
+            stat_callsToDate: { type: Number, default: 0 },
+            stat_lastCall: { type: Date, default: undefined },
+            stat_failsToDate: { type: Number, default: 0 }
         });
     }
     onUnknownCommand (api: API, name: string): Command | CommandLibrary {
@@ -65,10 +66,10 @@ class CustomCommands extends Plugin {
                             name: name,
                             content: content.join(" ")
                         });
-                        api.chat.whisper(caller, "Successfully added command '" + name + "'");
+                        api.reply(caller, "Successfully added command '" + name + "'");
                     } catch (err) {
                         if (err.name == "UniquePropertyError") {
-                            api.chat.whisper(caller, "There is already a command with the name '" + name + "'");
+                            api.reply(caller, "There is already a command with the name '" + name + "'");
                         }
                     }
                 }
@@ -79,9 +80,13 @@ class CustomCommands extends Plugin {
                     { name: "commandContent", type: "...string" }
                 ],
                 rank: { min: Ranks.mod },
-                call: (api: API, caller: Chatter, name: string, content: string) => {
+                call: (api: API, caller: Chatter, name: string, content: string[]) => {
                     // edit the message of a command
-                    console.log("Editing the command '" + name + "' to the content '" + content + "'");
+                    var command = this.collection.where({ name: name }).findOne();
+                    if (!command) return api.reply(caller, "There is no command by the name '" + name + "'");
+                    command.content = content.join(" ");
+                    command.save();
+                    api.reply(caller, "Successfully edited command '" + name + "'");
                 }
             },
             remove: {
@@ -91,7 +96,11 @@ class CustomCommands extends Plugin {
                 rank: { min: Ranks.mod },
                 call: (api: API, caller: Chatter, name: string) => {
                     // remove a command
-                    console.log("Removing the command '" + name + "'");
+                    var command = this.collection.where({ name: name }).findOne();
+                    if (!command) return api.reply(caller, "There is no command by the name '" + name + "'");
+
+                    command.delete();
+                    api.reply(caller, "Successfully removed the command '" + name + "'");
                 }
             },
             rename: {
@@ -102,18 +111,35 @@ class CustomCommands extends Plugin {
                 rank: { min: Ranks.mod },
                 call: (api: API, caller: Chatter, oldName: string, newName: string) => {
                     // rename a command
-                    console.log("Renaming the command '" + name + "' to '" + newName + "'");
+                    var command = this.collection.where({ name: oldName }).findOne();
+                    if (!command) return api.reply(caller, "There is no command by the name '" + name + "'");
+
+                    command.name = newName;
+                    try {
+                        command.save();
+                        api.reply(caller, "Successfully renamed the command '" + oldName + "' to '" + newName + "'");
+                    } catch (err) {
+                        if (err.name == "UniquePropertyError") {
+                            api.reply(caller, "There is already a command with the name '" + newName + "'");
+                        }
+                    }
                 }
             },
             rank: {
                 args: [
                     { name: "commandName", type: "string" },
-                    { name: "callerRank", type: "string|number" }
+                    { name: "callerRank", type: "string" }
                 ],
                 rank: { min: Ranks.mod },
                 call: (api: API, caller: Chatter, name: string, rank: string) => {
                     // change the rank of a custom command
-                    console.log("Changing the minimum rank to run the command '" + name + "' to '" + rank + "'");
+                    var command = this.collection.where({ name: name }).findOne();
+                    if (!command) return api.reply(caller, "There is no command by the name '" + name + "'");
+
+                    console.log(rank, Ranks.get(rank), Ranks[Ranks.get(rank)]);
+                    command.rank = Ranks.get(rank);
+                    command.save();
+                    api.reply(caller, "Successfully changed the rank required to run '" + name + "' to '" + Ranks[command.rank] + "'");
                 }
             }
         }

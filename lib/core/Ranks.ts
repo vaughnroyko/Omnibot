@@ -1,7 +1,7 @@
 enum Ranks {
     new = 0,
-    user = 0,
     regular = 1,
+    user = 1,
     viewer = 1,
     mod = 2,
     moderator = 2,
@@ -10,6 +10,7 @@ enum Ranks {
     channel = 4,
     broadcaster = 4,
     bot = 5,
+    omnibot = 5
 }
 function clamp (num: number, min?: number, max?: number) {
     if (min !== undefined && num < min) num = min;

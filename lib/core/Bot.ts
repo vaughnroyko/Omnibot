@@ -22,13 +22,16 @@ import Ranks = require("./Ranks");
 var databaseVersion = "1";
 
 export class Bot implements ChatHost {
+    private channel: string;
+    private identity: string;
+
     public logger: Logger;
-    public channel: string;
-    public identity: string;
-    public chat: Chat;
-    public commands: Commands;
-    public plugins: Plugin[];
     public database: Database;
+
+    private chat: Chat;
+    private commands: Commands;
+    private plugins: Plugin[];
+    private api: PluginAPI;
 
     constructor (public options: any) {
         this.channel = options.twitch.channel;
@@ -97,25 +100,39 @@ export class Bot implements ChatHost {
         this.chat = new Chat(this);
 
         this.chat.onChatMessage = (user: Chatter, message: string, isAction: boolean) => {
-            
             if (message[0] == "!") {
                 this.logger.log(user.displayName + " " + message);
-                
                 this.runCommand(user, message.slice(1));
+                user.stat_commandsToDate++;
             } else {
                 this.logger.log(user.displayName + (isAction ? " " : ": ") + message);
-                // TODO @stats -> message
+                user.stat_messagesToDate++;
             }
+            user.save();
         };
+        this.chat.onWhisper = (user: Chatter, message: string, isReceived: boolean) => {
+            if (isReceived && message[0] == "!") {
+                this.logger.log(user.displayName + " " + message);
+                this.runCommand(user, message.slice(1));
+                user.stat_commandsToDate++;
+            } else {
+                this.logger.log((isReceived ? "<- " : "-> ") + user.displayName + ": " + message);
+            }
+        }
 
-        var api = {
+        var whisperReplies = true;
+
+        this.api = {
             say: this.say.bind(this),
             whisper: this.chat.whisper.bind(this.chat),
+            reply: whisperReplies ? this.chat.whisper.bind(this.chat) : (to: Chatter, ...what: string[]) => {
+                this.say("@" + to.displayName, ...what);
+            },
             chat: this.chat,
             database: this.database
         };
 
-        this.commands = new Commands(api);
+        this.commands = new Commands(this.api);
         this.commands.add({
             stop: {
                 rank: Ranks.admin,
@@ -138,7 +155,7 @@ export class Bot implements ChatHost {
             }
         });
 
-        this.plugins = Plugins.load("plugins", api);
+        this.plugins = Plugins.load("plugins", this.api);
         for (var plugin of this.plugins) {
             this.commands.add(plugin.commandLibrary);
         }

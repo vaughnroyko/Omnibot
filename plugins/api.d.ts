@@ -27,8 +27,8 @@ declare module api {
     // api
     export enum Ranks {
         new = 0,
-        user = 0,
         regular = 1,
+        user = 1,
         viewer = 1,
         mod = 2,
         moderator = 2,
@@ -36,10 +36,15 @@ declare module api {
         administrator = 3,
         channel = 4,
         broadcaster = 4,
-        bot = 5
+        bot = 5,
+        omnibot = 5
     }
+    export module Ranks {
+        export function get (which: string | number): Ranks;
+    }
+
     export interface API {
-        say(...what: any[]): void;
+        reply (to: Chatter, ...what: any[]): void;
         chat: Chat;
         database: Database;
     }
