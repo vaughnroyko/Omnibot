@@ -1,21 +1,21 @@
 /// <reference path="../node_modules/weaving/typings/String-all.d.ts" />
 
-// variable pre-initialization (so it doesn't error when trying to use them before they're defined)
+// letiable pre-initialization (so it doesn't error when trying to use them before they're defined)
 
 import { Process, Arguments, Timeline } from "consolemate";
 Process.connect();
 
 import { Bot } from "./core/Bot";
-var bot: Bot;
+let bot: Bot;
 
 import { Options as OptionManager } from "./util/options";
-var optionManager: OptionManager;
+let optionManager: OptionManager;
 
 
 // set up the process basics--consolemate, arguments, etc
 
 Process.on.error("logger", function (err: Error) {
-    var success = false;
+    let success = false;
     try {
         if (typeof bot.logger == "object") {
             bot.logger.timestamp = false;
@@ -31,15 +31,15 @@ Process.on.error("logger", function (err: Error) {
 });
 
 
-var argReader = new Arguments.Reader;
+let argReader = new Arguments.Reader;
 argReader.flagAliases = {
     "developer|dev|d": "developer",
     "channel": "twitch.channel > 1"
 };
 argReader.throwIfArgumentsIncorrect = true;
 
-var options: any;
-var { options: o, flags, args } = argReader.read();
+let options: any;
+let { options: o, flags, args } = argReader.read();
 options = o;
 
 
@@ -47,12 +47,12 @@ options = o;
 // load needed modules
 
 import weaving = require("weaving");
-var StringUtils = weaving.StringUtils;
+let StringUtils = weaving.StringUtils;
 
 weaving.library.add(require("weaving-chalk"));
 
-var applyPrototypes = function (obj: any, target: Function) {
-    for (var fname in obj) {
+let applyPrototypes = function (obj: any, target: Function) {
+    for (let fname in obj) {
         obj[fname].applyTo(fname, target);
     }
 }
@@ -81,13 +81,13 @@ options.twitch.identity.username = options.twitch.identity.username.toLowerCase(
 if (options.twitch.channel[0] == "#") options.twitch.channel = options.twitch.channel.substring(1);
 options.twitch.channel = options.twitch.channel.toLowerCase();
 
-for (var i = 0; i < options.core.blacklist.length; i++)
+for (let i = 0; i < options.core.blacklist.length; i++)
     options.core.blacklist[i] = options.core.blacklist[i].toLowerCase();
 
 options.core.blacklist.push(options.twitch.channel, options.twitch.identity.username);
 
 // separate the twitch options
-var connectionOptions = options.twitch.identity;
+let connectionOptions = options.twitch.identity;
 options.twitch.identity = options.twitch.identity.username;
 
 bot = new Bot(options);

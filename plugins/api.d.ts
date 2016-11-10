@@ -10,9 +10,21 @@ declare module api {
 
     // chatters
     export interface Chat {
-        getChatter(data: string): Chatter;
+        /**
+         * Find a chatter.
+         */
+        findChatter(username: string): Chatter;
+        /**
+         * Get a list of all chatters currently watching.
+         */
         listChatters(): Chatter[];
+        /**
+         * Send a message to the chat.
+         */
         say(...what: any[]): void;
+        /**
+         * Whisper a message to a single user.
+         */
         whisper(to: Chatter | string, ...what: any[]): void;
     }
     export interface Chatter {
@@ -47,6 +59,7 @@ declare module api {
         reply (to: Chatter, ...what: any[]): void;
         chat: Chat;
         database: Database;
+        isLive: boolean;
     }
     
     // commands
@@ -68,7 +81,7 @@ declare module api {
     }
 
     // plugins
-    export class Plugin {
+    export abstract class Plugin {
         name: string;
         commands: CommandLibrary;
         constructor(name: string);
@@ -76,6 +89,7 @@ declare module api {
         onInit (api: API): void;
         //onClosing (): void;
         onUnknownCommand (api: API, commandName: string): Command | CommandLibrary;
+        onNewChatter (api: API, chatter: Chatter): void;
         //onCommandFailed (): void;
         //onChat (user: Chatter, message: string, whisper?: boolean): void;
 

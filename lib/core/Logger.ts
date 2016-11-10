@@ -4,7 +4,7 @@ import util = require("util");
 
 import { Console } from "consolemate";
 
-var sync = require("synchronicity");
+let sync = require("synchronicity");
 
 export class Logger {
 
@@ -16,19 +16,19 @@ export class Logger {
         folder = path.resolve(process.cwd(), folder);
         fs.mkdirs(folder);
 
-        var exists: boolean;
+        let exists: boolean;
         if (exists = fs.existsSync(this.folder + "/last") && fs.readdirSync(this.folder + "/last").length > 0) {
-            var t = fs.statSync(this.folder + "/last").mtime;
-            var formats = {
+            let t = fs.statSync(this.folder + "/last").mtime;
+            let formats = {
                 date: "{year}-{month}-{date}",
                 time: "{hour}.{minute}.{second}"
             };
-            var currentFolder = this.folder + "/" + Logger.getTimestamp(t, formats.date);
+            let currentFolder = this.folder + "/" + Logger.getTimestamp(t, formats.date);
             fs.moveSync(this.folder + "/last", currentFolder + "/" + Logger.getTimestamp(t, formats.time));
             exists = false;
         }
         if (!exists) {
-            var i = 0, err: Error, max = 10, delay = 100;
+            let i = 0, err: Error, max = 10, delay = 100;
             do {
                 try {
                     fs.mkdirsSync(this.folder + "/last");
@@ -52,9 +52,9 @@ export class Logger {
         }
     }
     logTo (selection: string, ...args: any[]) {
-        var result = "";
+        let result = "";
 
-        for (var i = 0; i < args.length; i++)
+        for (let i = 0; i < args.length; i++)
             result += " " + (typeof args[i] == "string" ? args[i] : util.inspect(args[i]));
 
         result = (this.timestamp ? Logger.getTimestamp(undefined,
@@ -65,7 +65,7 @@ export class Logger {
         fs.appendFileSync(this.folder + "/last/" + selection, "{#strip:{0}}\n".weave(result), "utf8");
     }
     withTimestamp (script: Function, ts: boolean) {
-        var timestamp = this.timestamp; this.timestamp = ts === undefined ? true : !!ts;
+        let timestamp = this.timestamp; this.timestamp = ts === undefined ? true : !!ts;
         script();
         this.timestamp = timestamp;
     }
@@ -81,7 +81,7 @@ export class Logger {
         "October", "November", "December"
     ];
     static getTimestamp (time = new Date(), format = "{year}-{month}-{date} {hour}:{minute}:{second}"): string {
-        var hr = new String(time.getHours().toString().padLeft(2, '0'));
+        let hr = new String(time.getHours().toString().padLeft(2, '0'));
         Object.defineProperty(hr, "short", { value: (time.getHours() - 1) % 12 + 1});
         return format.weave({
             year: time.getFullYear(),

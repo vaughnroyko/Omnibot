@@ -1,7 +1,7 @@
-var twitch = require("tmi.js");
-var sync = require("synchronicity");
+let twitch = require("tmi.js");
+let sync = require("synchronicity");
 
-var events = [
+let events = [
     "action", "chat", "clearchat", "whisper",
     "connected", "disconnected", "reconnect",
     "emoteonly", "emotesets",
@@ -34,7 +34,7 @@ export class Client {
         if (events.indexOf(event) > -1) {
             if (!Array.isArray(this.events[event])) 
                 this.events[event] = typeof this.events[event] == "function" ? [this.events[event] as Function] : [];
-            var index = this.events[event].length;
+            let index = this.events[event].length;
             (this.events[event] as Function[]).push(callback);
             (callback as any).cancel = (): any => (this.events[event] as Function[])[index] = undefined;
             return callback;
@@ -45,8 +45,8 @@ export class Client {
         if (events.indexOf(event) > -1) {
             if (!Array.isArray(this.events[event])) 
                 this.events[event] = typeof this.events[event] == "function" ? [this.events[event] as Function] : [];
-            var index = this.events[event].length;
-            var cb = (...args: any[]) => {
+            let index = this.events[event].length;
+            let cb = (...args: any[]) => {
                 (this.events[event] as Function[])[index] = undefined;
                 callback(...args);
             };
@@ -64,11 +64,11 @@ export class Client {
         this.channel = options.channel;
         this.username = options.identity.username;
 
-        for (var event of events) ((event: string) => {
+        for (let event of events) ((event: string) => {
             this.twitch.on(event, (...args: any[]) => {
-                var eventCallbacks = this.events[event];
+                let eventCallbacks = this.events[event];
                 if (Array.isArray(eventCallbacks)) {
-                    for (var eventCallback of eventCallbacks) if (eventCallback) 
+                    for (let eventCallback of eventCallbacks) if (eventCallback) 
                         eventCallback(...args.slice(1));
                 } else if (typeof eventCallbacks == "function") eventCallbacks(...args);
             });
@@ -78,7 +78,7 @@ export class Client {
         this.twitch.connect();
     }
     connectSync (options: ClientOptions) {
-        var connected = false;
+        let connected = false;
         this.connect(options, () => connected = true);
         sync.until(() => connected);
     }

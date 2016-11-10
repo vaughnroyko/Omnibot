@@ -1,11 +1,12 @@
 /// <reference path="./fs.d.ts" />
 import fs = require("fs-extra");
 
-var sync = require("synchronicity");
+let sync = require("synchronicity");
 
 fs.tryReadSync = function () {
+    let result: any;
     try {
-        var result = fs.readFileSync.apply(fs, Array.prototype.slice.apply(arguments, [0, -1]));
+        result = fs.readFileSync.apply(fs, Array.prototype.slice.apply(arguments, [0, -1]));
     } catch (err) {
     	if (err.code != "ENOENT") throw err;
     }

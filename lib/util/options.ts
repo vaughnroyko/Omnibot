@@ -1,16 +1,16 @@
 import path = require("path");
 import fs = require("./fs");
 
-var season: any, _: any;
+let season: any, _: any;
 
 export type OptionsObject = { [key: string]: { [key: string]: any } };
 
-var loadOptions = function (folder: string, files: string[]): OptionsObject {
-    var result: OptionsObject = {};
-    for (var file of files) {
-        var filePath = path.join(folder, file);
+let loadOptions = function (folder: string, files: string[]): OptionsObject {
+    let result: OptionsObject = {};
+    for (let file of files) {
+        let filePath = path.join(folder, file);
         if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, "");
-        var obj = season.readFileSync(filePath);
+        let obj = season.readFileSync(filePath);
         if (obj) result[file.split(".").shift()] = obj;
     }
     return result;

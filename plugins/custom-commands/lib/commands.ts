@@ -5,12 +5,13 @@ import {
     Collection, Document
 } from "../../api";
 
-class CustomCommand extends Document {
+export class CustomCommand extends Document {
     public name: string;
     public rank: number;
     public content: string;
     public stat_callsToDate: number;
     public stat_lastCall: Date;
+    public stat_failsToDate: number;
 
     private command: Command;
     static getCommand (customCommand: CustomCommand): Command {
@@ -27,7 +28,7 @@ class CustomCommand extends Document {
     }
 }
 
-class CustomCommands extends Plugin {
+export class CustomCommands extends Plugin {
     constructor () { super("custom-commands"); }
 
     collection: Collection<CustomCommand>;
@@ -44,7 +45,7 @@ class CustomCommands extends Plugin {
         });
     }
     onUnknownCommand (api: API, name: string): Command | CommandLibrary {
-        var customCommand = name in this.loadedCommands ? 
+        let customCommand = name in this.loadedCommands ? 
             this.loadedCommands[name] : this.collection.where({ name: name }).findOne();
         if (!customCommand) return;
         this.loadedCommands[name] = customCommand;
@@ -70,7 +71,7 @@ class CustomCommands extends Plugin {
                     } catch (err) {
                         if (err.name == "UniquePropertyError") {
                             api.reply(caller, "There is already a command with the name '" + name + "'");
-                        }
+                        } else throw err;
                     }
                 }
             },
@@ -82,7 +83,7 @@ class CustomCommands extends Plugin {
                 rank: { min: Ranks.mod },
                 call: (api: API, caller: Chatter, name: string, content: string[]) => {
                     // edit the message of a command
-                    var command = this.collection.where({ name: name }).findOne();
+                    let command = this.collection.where({ name: name }).findOne();
                     if (!command) return api.reply(caller, "There is no command by the name '" + name + "'");
                     command.content = content.join(" ");
                     command.save();
@@ -96,7 +97,7 @@ class CustomCommands extends Plugin {
                 rank: { min: Ranks.mod },
                 call: (api: API, caller: Chatter, name: string) => {
                     // remove a command
-                    var command = this.collection.where({ name: name }).findOne();
+                    let command = this.collection.where({ name: name }).findOne();
                     if (!command) return api.reply(caller, "There is no command by the name '" + name + "'");
 
                     command.delete();
@@ -111,7 +112,7 @@ class CustomCommands extends Plugin {
                 rank: { min: Ranks.mod },
                 call: (api: API, caller: Chatter, oldName: string, newName: string) => {
                     // rename a command
-                    var command = this.collection.where({ name: oldName }).findOne();
+                    let command = this.collection.where({ name: oldName }).findOne();
                     if (!command) return api.reply(caller, "There is no command by the name '" + name + "'");
 
                     command.name = newName;
@@ -121,7 +122,7 @@ class CustomCommands extends Plugin {
                     } catch (err) {
                         if (err.name == "UniquePropertyError") {
                             api.reply(caller, "There is already a command with the name '" + newName + "'");
-                        }
+                        } else throw err;
                     }
                 }
             },
@@ -133,10 +134,9 @@ class CustomCommands extends Plugin {
                 rank: { min: Ranks.mod },
                 call: (api: API, caller: Chatter, name: string, rank: string) => {
                     // change the rank of a custom command
-                    var command = this.collection.where({ name: name }).findOne();
+                    let command = this.collection.where({ name: name }).findOne();
                     if (!command) return api.reply(caller, "There is no command by the name '" + name + "'");
 
-                    console.log(rank, Ranks.get(rank), Ranks[Ranks.get(rank)]);
                     command.rank = Ranks.get(rank);
                     command.save();
                     api.reply(caller, "Successfully changed the rank required to run '" + name + "' to '" + Ranks[command.rank] + "'");
@@ -145,5 +145,3 @@ class CustomCommands extends Plugin {
         }
     }
 }
-
-export = new CustomCommands as Plugin;

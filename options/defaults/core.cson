@@ -1,23 +1,9 @@
-exitOnException: false
+exitOnError: false
 
+# prefixes to start a message with in order to do something different
 prefixes:
-    basic: "!"
-    mod: "^"
-    admin: "@"
-
-logChats: true
-
-modules:
-    points:
-        enabled: true
-        startWith: 5
-        perMinute: 1
-
-    customCommands:
-        enabled: true
-
-    quotes:
-        enabled: true
+    command: "!"
+    whisper: "@"
 
 # channel name is included by default
 keywords: []
@@ -25,4 +11,5 @@ keywords: []
 # the time it takes for a user to be able to use more advanced bot commands (like quote and such)
 userTrustTime: 120
 
+# users that don't appear on the bot
 blacklist: []

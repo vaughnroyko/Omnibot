@@ -1,0 +1,9 @@
+commands:
+    quote:
+        normal: "The quote by {displayName} was added! #{1.id}"
+        unknown: "It seems {0} not in my database yet!"
+        rank: "Only regulars can use this command, {displayName}."
+
+    recite:
+        normal: "#{id}: \"{text}\" -{author}, {time.year} (Added by {addedBy})"
+        noQuotes: "There are no quotes{0? by {displayName}} in my database yet!"

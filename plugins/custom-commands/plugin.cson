@@ -1,2 +1,3 @@
 name: "custom-commands"
 main: "out/commands.js"
+exportName: "CustomCommands"

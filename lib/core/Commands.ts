@@ -1,33 +1,43 @@
-var _ = require("underscore-plus");
+let _ = require("underscore-plus");
 
 import Ranks = require("./Ranks");
 import { Chatter, Chat } from "./Chat";
 import { PluginAPI } from "./PluginAPI";
 
-export class CommandFailure {
-    constructor(public expected: Argument, public given?: string) {}
+import weaving = require("weaving");
+
+export class ArgumentsProvidedError extends weaving.Error {
+    weavingMessage = "Expected type of argument '{0}' to be '{1}'{2?, but was given '{2}'}";
+}
+export class ArgumentMatcherError extends weaving.Error {
+    weavingMessage = "{0}";
 }
 
 class ArgumentMatcher {
     constructor (private chat: Chat) {}
 
-    match (expectedArguments: Argument[], givenArguments: string[]): any[] | CommandFailure {
-        var result: any[] = [], consumeRemaining: Argument;
-        for (var i = 0; i < expectedArguments.length || (consumeRemaining && i < givenArguments.length); i++) {
+    match (expectedArguments: Argument[], givenArguments: string[]): any[] | ArgumentsProvidedError {
+        let result: any[] = [], consumeRemaining: Argument, optionalRemaining = false;
+        for (let i = 0; i < expectedArguments.length || (consumeRemaining && i < givenArguments.length); i++) {
 
-            var expected = consumeRemaining || expectedArguments[i], given = givenArguments[i];
-            if (!given) return new CommandFailure(expected, given);
+            let expected = consumeRemaining || expectedArguments[i], given = givenArguments[i];
+            if (expected.type.endsWith("?")) 
+                optionalRemaining = true, expected = { name: expected.name, type: expected.type.slice(0, -1) };
+            else if (optionalRemaining) 
+                return new ArgumentMatcherError("All requested arguments following an optional argument must also be optional.");
 
-            var toPush: any;
+            if (!given && !optionalRemaining) return new ArgumentsProvidedError(expected.name || i, given);
+
+            let toPush: any;
             if (!consumeRemaining && expected.type.startsWith("...")) 
                 expected = consumeRemaining = { name: expected.name, type: expected.type.slice(3) }, result.push([]);
-
+                
             if (expected.type == "number") {
                 toPush = parseFloat(given);
-                if (isNaN(toPush)) return new CommandFailure(expected, given);
+                if (isNaN(toPush)) return new ArgumentsProvidedError(expected, given);
             } else if (expected.type == "user") {
                 toPush = this.chat.getChatter(given);
-                if (!toPush) return new CommandFailure(expected, given);
+                if (!toPush) return new ArgumentsProvidedError(expected, given);
             } else if (expected.type == "string") toPush = given;
             if (consumeRemaining) result[result.length - 1].push(toPush); else result.push(toPush);
 
@@ -59,8 +69,8 @@ export module Library {
         _.extend(lib, ...toAdd);
     }
     export function remove (lib: Library, ...toRemove: Library[]) {
-        for (var libToRemoveWith of toRemove) {
-            for (var commandName in libToRemoveWith) {
+        for (let libToRemoveWith of toRemove) {
+            for (let commandName in libToRemoveWith) {
                 if (commandName in lib) delete lib[commandName];
             }
         }
@@ -79,9 +89,9 @@ export class Commands {
         Library.merge(this.library, ...lib);
     }
     call (input: string, chatter: Chatter): { success: boolean, result?: any } {
-        var result: { success: boolean, result?: any } = { success: false };
-        var splitCommand = input.split(/\s+/);
-        var lib = this.library, name: string;
+        let result: { success: boolean, result?: any } = { success: false };
+        let splitCommand = input.split(/\s+/);
+        let lib = this.library, name: string;
         do {
             name = splitCommand.shift();
             if (!(name && name in lib)) {
@@ -94,19 +104,19 @@ export class Commands {
             if ("call" in lib[name]) break;
             else lib = lib[name] as Library;
         } while (true);
-        var command = lib[name] as Command;
-        var args: any[] = [];
+        let command = lib[name] as Command;
+        let args: any[] = [];
         if ("args" in command) {
             args = this.argumentMatcher.match(command.args, splitCommand) as any[];
-            if (args instanceof CommandFailure) {
+            if (args instanceof ArgumentsProvidedError) {
                 // TODO emit command failure event here
                 return result;
             }
         }
         if ("rank" in command) {
-            var rank = command.rank;
+            let rank = command.rank;
             if (typeof rank == "object") {
-                var rankMatcher = rank as RankMatcher;
+                let rankMatcher = rank as RankMatcher;
                 if (
                     ("min" in rankMatcher && chatter.rank < Ranks.get(rankMatcher.min)) ||
                     ("max" in rankMatcher && chatter.rank > Ranks.get(rankMatcher.max))

@@ -1,0 +1,21 @@
+commands:
+    logCommandFails: false
+    notFound: "{1.displayName} tried to run the command '{0}' but it doesn't exist"
+
+    notExist: "The custom command by name '{0}' does not exist"
+    create:
+        success: "Successfully added the command '{0}'"
+        fail: "Could not add the command '{0}'"
+        exist: "There is already a command by the name '{0}'"
+    edit:
+        success: "Successfully edited the command '{0}'"
+        fail: "Could not edit the command '{0}'"
+    remove:
+        success: "Successfully removed the command '{0}'"
+        fail: "Could not remove the command '{0}'"
+    rename:
+        success: "The command '{0}' was successfully renamed to '{1}'"
+        fail: "Could not rename the command '{0}'"
+    rank:
+        success: "The required rank of command '{0}' was changed to '{1}'"
+        fail: "Could not change the required rank of command '{0}'"

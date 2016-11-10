@@ -1,0 +1,3 @@
+name: "points"
+main: "out/points.js"
+exportName: "Points"

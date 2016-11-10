@@ -1,0 +1,21 @@
+style: 'green.bold'
+commands:
+    join:
+        normal: "{0.displayName} has {1} points!"
+        first: "Gave {0.displayName} {1} points for joining for the first time."
+
+    balance:
+        normal: "{2?You have:{0.displayName} has} {1} points{2?, {0.displayName}}!"
+        blacklisted: "{1?Your:{2?My own:{0.displayName}'s}} balance exceeds the limits of my computational power{1?, {0.displayName}}."
+        unknown: "It seems {1?you're:{0} is} not in my database yet{1?, {0.displayName}}."
+
+    top: "Top {0}: {1*, :{&.user}~: {&.count}}"
+
+    donate:
+        notEnough: "You are short {1} points, {displayName}"
+        notExist: "{1} is not a valid user, {displayName}"
+        success: "{displayName} has given {1.displayName} {2} points!"
+        thief: "Are you trying to steal, {displayName}?"
+
+    awardSuccess: "A total of {0} points was distributed to {1} users."
+    taxSuccess: "A total of {0} points was taxed from {1} users."

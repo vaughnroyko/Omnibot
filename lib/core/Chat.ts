@@ -1,4 +1,5 @@
 import { Database, Collection, Schema, Document } from "typego";
+import { Timeline } from "consolemate";
 
 import Ranks = require("./Ranks");
 
@@ -16,6 +17,7 @@ export interface UserData {
 export interface ChatHost {
     database: Database;
     logger: Logger;
+    isLive: boolean;
 }
 
 export class Chat {
@@ -42,18 +44,24 @@ export class Chat {
         this.client.on("part", this.part.bind(this));
         this.client.on("whisper", (userData: UserData, message: string, self: boolean) => {
             if (!self) {
-                var chatter = this.getChatter(userData);
+                let chatter = this.getChatter(userData);
                 if (this.onWhisper) this.onWhisper(chatter, message.trim(), true);
             }
         });
         
         this.client.on("chat", (userData: UserData, message: string) => {
-            var chatter = this.getChatter(userData);
+            let chatter = this.getChatter(userData);
             if (this.onChatMessage) this.onChatMessage(chatter, message, false);
         });
         this.client.on("action", (userData: UserData, message: string) => {
-            var chatter = this.getChatter(userData);
+            let chatter = this.getChatter(userData);
             if (this.onChatMessage) this.onChatMessage(chatter, message, true);
+        });
+
+        Timeline.repeat.forever(60, () => {
+            if (this.host.isLive) {
+                this.chatters.where({ chatting: true }).update({ $inc: { stat_time: 1 } });
+            }
         });
     }
 
@@ -70,16 +78,16 @@ export class Chat {
      * Retrieve a chatter from the database. If the chatter doesn't exist yet, add them to the database.
      */
     getChatter (data: string | UserData): Chatter {
-        var name: string, rank = Ranks["new"];
+        let name: string, rank = Ranks["new"];
         
         if (typeof data == "object") {
-            var userData = data as UserData;
+            let userData = data as UserData;
             name = userData.name || userData["display-name"];
             if ("mod" in userData) rank = userData.mod ? Ranks.mod : Ranks["new"];
         } else if (typeof data == "string") name = data as string;
         name = name.toLowerCase();
 
-        var result = this.chatters.where({ name: name }).findOne();
+        let result = this.chatters.where({ name: name }).findOne();
 
         if (name == this.username.toLowerCase()) rank = Ranks.bot;
         else if (name == this.channel.toLowerCase()) rank = Ranks.channel;
@@ -92,26 +100,36 @@ export class Chat {
                 name: name,
                 rank: rank
             });
+            result["isNew"] = true;
         }
 
         return result;
     }
 
     /**
+     * Find a chatter.
+     */
+    findChatter (username: string) {
+        return this.chatters.where({ name: username }).findOne();
+    }
+
+    /**
      * When a user joins the chat.
      */
     private join (chatter: string | UserData) {
-        var ch = this.getChatter(chatter);
+        let ch = this.getChatter(chatter);
         ch.chatting = true;
         ch.save();
+        if (this.onUserJoin) this.onUserJoin(ch, ch["isNew"]);
     }
     /**
      * When a user leaves the chat.
      */
     private part (chatter: string | UserData) {
-        var ch = this.getChatter(chatter);
+        let ch = this.getChatter(chatter);
         ch.chatting = false;
         ch.save();
+        if (this.onUserPart) this.onUserPart(ch);
     }
 
     /**
@@ -132,7 +150,7 @@ export class Chat {
      * Whisper to a user.
      */
     whisper (to: Chatter | string, ...what: any[]) {
-        var user: string = typeof to == "string" ? to as string : (to as Chatter).name;
+        let user: string = typeof to == "string" ? to as string : (to as Chatter).name;
         this.client.whisper(user, ...what);
         if (this.onWhisper)
             this.onWhisper(typeof to == "string" ? this.getChatter(to) : to as Chatter, what.join(" ").trim(), false);
@@ -144,7 +162,7 @@ export class Chat {
     /**
      * Called when a user joins the chat.
      */
-    onUserJoin: (user: Chatter) => void;
+    onUserJoin: (user: Chatter, isNew: boolean) => void;
     /**
      * Called when a user leaves the chat.
      */
@@ -157,7 +175,6 @@ export class Chat {
      * Called when a whisper is sent or recieved.
      */
     onWhisper: (user: Chatter, message: string, isReceived: boolean) => void;
-
 }
 
 export class Chatter extends Document {
