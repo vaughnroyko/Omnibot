@@ -4,10 +4,12 @@ import { Database } from "typego";
 
 import fs = require("../util/fs");
 
-import { Library, Command } from "./Commands";
+import { Library, Command, Commands } from "./Commands";
 import { Chat, Chatter } from "./Chat";
 
-import { PluginAPI } from "./PluginAPI";
+import { PluginAPI } from "./support/PluginAPI";
+import { Channel } from "./support/Channel";
+import Options = require("./support/Options");
 
 import weaving = require("weaving");
 
@@ -16,7 +18,7 @@ weaving.library.add(function (library) {
         name: "weaving-chalk",
         match: ["@", library.KEYS, ":", library.KEYS],
         return: (_o: string, fn: weaving.Matchables.Matched.KEYS, _c: string, using: weaving.Matchables.Matched.KEYS) => {
-            
+            console.log(fn);
         }
     };
 });
@@ -32,10 +34,10 @@ class PluginError extends weaving.Error {
     weavingMessage = "Could not load the plugin '{0}'{1?~: {1}}";
 }
 class InvalidPluginDefinitionFileError extends weaving.Error {
-    weavingMessage = "Invalid plugin definition file."
+    weavingMessage = "Invalid or no plugin definition file."
 }
 
-export class InternalPlugin {
+export class PluginWrapper {
     name: string;
     directory: string;
     commandLibrary: Library = {};
@@ -78,46 +80,89 @@ export class InternalPlugin {
         // api call
         this.plugin.onInit(this.api);
     }
-
-    // events
-    onUnknownCommand (commandName: string): Command | Library {
-        return this.plugin.onUnknownCommand(this.api, commandName);
-    }
-    onChatterJoin (chatter: Chatter, isNew: boolean) {
-        this.plugin.onChatterJoin(this.api, chatter, isNew);
-    }
 }
 
 export abstract class Plugin {
     commands: Library = {};
-    constructor(public name: string) {}
+    constructor (public name: string) {}
 
-    onInit (api: PluginAPI): void {}
     //// TODO more api support
+    onInit?: (api: PluginAPI) => void;
     //onClosing (): void {}
-    onUnknownCommand (api: PluginAPI, commandName: string): Command | Library { return; }
-    onChatterJoin (api: PluginAPI, chatter: Chatter, isNew: boolean): void {}
+    onUnknownCommand?: (api: PluginAPI, commandName: string) => Command | Library;
+    onChatterJoin?: (api: PluginAPI, chatter: Chatter, isNew: boolean) => void;
+    onChatterPart?: (api: PluginAPI, chatter: Chatter, isNew: boolean) => void;
+    onUpdate?: (api: PluginAPI) => void;
     //onCommandFailed (): void {}
     //onChat (user: Chatter, message: string, whisper = false): void {}
 }
 
-export module Plugins {
-    export function load (directory: string, api: PluginAPI) {
+export class PluginManager {
+    api: PluginAPI;
+    plugins: PluginWrapper[] = [];
+    constructor (directory: string, chat: Chat, commands: Commands, database: Database, channel: Channel, options: Options) {
+        
+        // the api used by plugins
+        this.api = {
+            say: chat.say.bind(chat),
+            whisper: chat.whisper.bind(chat),
+            reply: chat.reply.bind(chat),
+            chat: chat,
+            database: database
+        } as any;
+        Object.defineProperty(this.api, "isLive", () => channel.live);
+
+        // send events to plugins
+        commands.onUnknownCommand = this.onUnknownCommand.bind(this);
+        chat.onChatterJoin = this.onChatterJoin.bind(this);
+        chat.onChatterPart = this.onChatterPart.bind(this);
+
         directory = path.resolve(directory);
         let dirContents = fs.readdirSync(directory);
-        let result: InternalPlugin[] = [];
         for (let pluginDir of dirContents) {
             try {
-                let plugin = new InternalPlugin(path.join(directory, pluginDir), api);
-                if (plugin) result.push(plugin);
+                let plugin = new PluginWrapper(path.join(directory, pluginDir), this.api);
+                if (plugin) this.plugins.push(plugin);
             } catch (err) {
                 if (err instanceof PluginError) {
                     console.log(err.message);
                 } else if (err instanceof InvalidPluginDefinitionFileError) {
-                    // we ignore invalid plugin definition file errors
+                    // we ignore invalid plugin definition file errors--either not valid cson or it's not actually a plugin
                 } else throw err;
             }
         }
-        return result;
+    }
+    forEach (callback: (plugin: PluginWrapper) => any) {
+        for (let plugin of this.plugins) callback(plugin);
+    }
+
+    // events
+    onInit () {
+        for (let wrapper of this.plugins) if (wrapper.plugin.onInit) {
+            wrapper.plugin.onInit(this.api);
+        }
+    }
+    onUnknownCommand (commandName: string): Command | Library {
+        for (let wrapper of this.plugins) {
+            if (wrapper.plugin.onUnknownCommand) {
+                let result = wrapper.plugin.onUnknownCommand(this.api, commandName);
+                if (result) return result
+            }
+        }
+    }
+    onChatterJoin (chatter: Chatter, isNew: boolean) {
+        for (let wrapper of this.plugins) if (wrapper.plugin.onChatterJoin) {
+            wrapper.plugin.onChatterJoin(this.api, chatter, isNew);
+        }
+    }
+    onChatterPart (chatter: Chatter, isNew: boolean) {
+        for (let wrapper of this.plugins) if (wrapper.plugin.onChatterPart) {
+            wrapper.plugin.onChatterPart(this.api, chatter, isNew);
+        }
+    }
+    onUpdate () {
+        for (let wrapper of this.plugins) if (wrapper.plugin.onUpdate) {
+            wrapper.plugin.onUpdate(this.api);
+        }
     }
 }

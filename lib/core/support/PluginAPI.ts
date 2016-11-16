@@ -1,4 +1,4 @@
-import { Chat } from "./Chat";
+import { Chat } from "../Chat";
 import { Database } from "typego";
 export interface PluginAPI {
     say (...what: any[]): void;

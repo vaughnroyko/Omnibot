@@ -1,9 +1,10 @@
+//// TODO
+let whisperReplies = true;
+
 import { Database, Collection, Schema, Document } from "typego";
 import { Timeline } from "consolemate";
 
-import Ranks = require("./Ranks");
-
-import { Logger } from "./Logger";
+import Ranks = require("./support/Ranks");
 
 import { Client, ClientOptions } from "./Client";
 export { ClientOptions };
@@ -14,20 +15,14 @@ export interface UserData {
     mod?: boolean;
 }
 
-export interface ChatHost {
-    database: Database;
-    logger: Logger;
-    isLive: boolean;
-}
-
 export class Chat {
     private client: Client;
     private chatters: Collection<Chatter>;
     private username: string;
     private channel: string;
 
-    constructor(private host: ChatHost) {
-        this.chatters = this.host.database.collection<Chatter>("chatters", {
+    constructor(database: Database, isLive: () => boolean) {
+        this.chatters = database.collection<Chatter>("chatters", {
             name: { type: String, unique: true },
             displayName: { type: String, fillWith: "name" },
             rank: { type: Number, default: Ranks["new"] },
@@ -59,7 +54,7 @@ export class Chat {
         });
 
         Timeline.repeat.forever(60, () => {
-            if (this.host.isLive) {
+            if (isLive()) {
                 this.chatters.where({ chatting: true }).update({ $inc: { stat_time: 1 } });
             }
         });
@@ -120,7 +115,7 @@ export class Chat {
         let ch = this.getChatter(chatter);
         ch.chatting = true;
         ch.save();
-        if (this.onUserJoin) this.onUserJoin(ch, ch["isNew"]);
+        if (this.onChatterJoin) this.onChatterJoin(ch, ch["isNew"]);
     }
     /**
      * When a user leaves the chat.
@@ -129,7 +124,7 @@ export class Chat {
         let ch = this.getChatter(chatter);
         ch.chatting = false;
         ch.save();
-        if (this.onUserPart) this.onUserPart(ch);
+        if (this.onChatterPart) this.onChatterPart(ch);
     }
 
     /**
@@ -156,17 +151,22 @@ export class Chat {
             this.onWhisper(typeof to == "string" ? this.getChatter(to) : to as Chatter, what.join(" ").trim(), false);
     }
 
+    reply (to: Chatter, ...what: string[]) {
+        if (whisperReplies) this.whisper(to, ...what);
+        else this.say("@" + to.displayName, ...what);
+    }
+
 
     // events
 
     /**
      * Called when a user joins the chat.
      */
-    onUserJoin: (user: Chatter, isNew: boolean) => void;
+    onChatterJoin: (user: Chatter, isNew: boolean) => void;
     /**
      * Called when a user leaves the chat.
      */
-    onUserPart: (user: Chatter) => void;
+    onChatterPart: (user: Chatter) => void;
     /**
      * Called when a chat message is recieved.
      */

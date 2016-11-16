@@ -46,11 +46,17 @@ export class Logger {
         }
     }
 
+    /**
+     * Logs to the console and the selected file.
+     */
     log (...what: any[]) {
         if (typeof this.selected == "string") {
             this.logTo(this.selected, ...what);
         }
     }
+    /**
+     * Logs to the console and to the file name provided.
+     */
     logTo (selection: string, ...args: any[]) {
         let result = "";
 
@@ -70,16 +76,15 @@ export class Logger {
         this.timestamp = timestamp;
     }
 
-    /**
-     * Get a timestamp based off of a time and a weaving string.
-     */
-
     private static months = [
         "January", "February", "March",
         "April", "May", "June",
         "July", "August", "September",
         "October", "November", "December"
     ];
+    /**
+     * Get a timestamp based off of a time and a weaving string.
+     */
     static getTimestamp (time = new Date(), format = "{year}-{month}-{date} {hour}:{minute}:{second}"): string {
         let hr = new String(time.getHours().toString().padLeft(2, '0'));
         Object.defineProperty(hr, "short", { value: (time.getHours() - 1) % 12 + 1});

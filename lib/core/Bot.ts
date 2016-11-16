@@ -16,13 +16,17 @@ console.log = Console.logLine;
 // load modules from the bot
 import { Logger } from "./Logger";
 
-import { Chat, Chatter, UserData, ChatHost } from "./Chat";
+import { Chat, Chatter, UserData } from "./Chat";
 import { Commands } from "./Commands";
 
-import { Plugins, InternalPlugin as Plugin } from "./Plugins";
-import { PluginAPI } from "./PluginAPI";
+import { PluginManager, PluginWrapper as Plugin } from "./Plugins";
+import { PluginAPI } from "./support/PluginAPI";
 
-import Ranks = require("./Ranks");
+import Ranks = require("./support/Ranks");
+
+import { Channel } from "./support/Channel";
+
+import Options = require("./support/Options");
 
 // configuration
 let databaseVersion = "1";
@@ -30,33 +34,28 @@ let gettingStreamData = {
     timeout: 60,
     logErrors: true
 };
-let whisperReplies = true;
 let twitchApiStreamPath = "api.twitch.tv/kraken/streams/";
 
 // the bot!
-export class Bot implements ChatHost {
-    private channel: string;
-    private identity: string;
+export class Bot {
+    identity: string;
 
-    public logger: Logger;
-    public database: Database;
+    logger: Logger;
+    database: Database;
 
-    private chat: Chat;
-    private commands: Commands;
-    private plugins: Plugin[];
-    private api: PluginAPI;
+    chat: Chat;
+    commands: Commands;
+    plugins: PluginManager;
+
+    _updateLoop: Timeline.LoopHandle;
     
-    private _isLive: boolean;
-    private _streamCreated: Date;
-    private _updateLoop: Timeline.LoopHandle;
+    channel: Channel = { name: undefined, live: false, status: "", stream: undefined, language: undefined };
 
-    get isLive () { return this._isLive; }
-    // TODO experiment with catching when the connection goes down for a minute
-    // a case where the stream is technically 'new' afterwards, but not intentionally
-    get uptime () { return Date.now() - this._streamCreated.getTime(); }
+    get isLive () { return this.channel.live; }
+    get uptime () { return Date.now() - this.channel.stream.start.getTime(); }
 
-    constructor (public options: any) {
-        this.channel = options.twitch.channel;
+    constructor (public options: Options) {
+        this.channel.name = options.twitch.channel;
         this.identity = options.twitch.identity;
 
         this.logger = new Logger("logs");
@@ -84,7 +83,7 @@ export class Bot implements ChatHost {
         let result = this.commands.call(input, user);
         if (!result.success) {
             // TODO @stats -> command failure
-            switch (this.options.output.commandFails) {
+            switch (this.options.output.commands.failure) {
                 case "whisper": {
                     // whisper the failure message to the executing user
                     break;
@@ -102,7 +101,7 @@ export class Bot implements ChatHost {
         // connect to the database
 
         try {
-            this.database = new Database(this.options.mongo.path + "V" + databaseVersion + "#" + this.channel);
+            this.database = new Database(this.options.mongo.path + "V" + databaseVersion + "#" + this.channel.name);
         } catch (err) {
             // if we can't connect to the database, there's no point in going any farther
             this.logger.timestamp = false;
@@ -121,22 +120,10 @@ export class Bot implements ChatHost {
 
 
         // connect to twitch 
-        this.chat = new Chat(this);
-
-        // the api used by plugins
-        this.api = {
-            say: this.say.bind(this),
-            whisper: this.chat.whisper.bind(this.chat),
-            reply: whisperReplies ? this.chat.whisper.bind(this.chat) : (to: Chatter, ...what: string[]) => {
-                this.say("@" + to.displayName, ...what);
-            },
-            chat: this.chat,
-            database: this.database
-        } as any;
-        Object.defineProperty(this.api, "isLive", { get: () => this._isLive });
+        this.chat = new Chat(this.database, () => this.channel.live);
 
         // initiate the command library
-        this.commands = new Commands(this.api);
+        this.commands = new Commands(this.chat);
         this.commands.add({
             stop: {
                 rank: Ranks.admin,
@@ -159,10 +146,10 @@ export class Bot implements ChatHost {
             },
             uptime: {
                 call: (api: PluginAPI, caller: Chatter) => {
-                    if (this._isLive) {
-                        api.reply(caller, this.channel + " has been live for " + this.uptime);
+                    if (this.channel.live) {
+                        api.reply(caller, this.channel.name + " has been live for " + this.uptime);
                     } else {
-                        api.reply(caller, this.channel + " is not live!");
+                        api.reply(caller, this.channel.name + " is not live!");
                     }
                 }
             },
@@ -173,14 +160,14 @@ export class Bot implements ChatHost {
                         type: "string?"
                     }
                 ],
-                call: (api: PluginAPI, caller: Chatter, requestedUser: string) => {
+                call: (caller: Chatter, requestedUser: string) => {
                     let chatter: Chatter;
                     if (requestedUser) {
-                        chatter = api.chat.findChatter(requestedUser);
-                        if (!chatter) return api.reply(caller, "Are you sure '" + requestedUser + "' has been here before?");
+                        chatter = this.chat.findChatter(requestedUser);
+                        if (!chatter) return this.chat.reply(caller, "Are you sure '" + requestedUser + "' has been here before?");
                     } else chatter = caller;
 
-                    api.reply(caller, 
+                    this.chat.reply(caller, 
                         (requestedUser ? requestedUser + " has " : "You have ") + chatter.stat_time + " minutes logged."
                     );
                 }
@@ -188,23 +175,8 @@ export class Bot implements ChatHost {
         });
 
         // load all the plugins, add any commands the plugins provide to the command library
-        this.plugins = Plugins.load("plugins", this.api);
-        for (let plugin of this.plugins) {
-            this.commands.add(plugin.commandLibrary);
-        }
-
-        // send events to plugins
-        this.commands.onUnknownCommand = (name: string) => {
-            for (let plugin of this.plugins) {
-                let command = plugin.onUnknownCommand(name);
-                if (command) return command;
-            }
-        }
-        this.chat.onUserJoin = (chatter: Chatter, isNew: boolean) => {
-            for (let plugin of this.plugins) {
-                plugin.onChatterJoin(chatter, isNew);
-            }
-        }
+        this.plugins = new PluginManager("plugins", this.chat, this.commands, this.database, this.channel, this.options);
+        this.plugins.forEach((plugin) => this.commands.add(plugin.commandLibrary));
 
         // on chat message, print the message, if it's a command, trigger the commands module
         this.chat.onChatMessage = (user: Chatter, message: string, isAction: boolean) => {
@@ -231,10 +203,10 @@ export class Bot implements ChatHost {
         // if we've made it this far, we're ready to connect and start receiving!
         this.logger.log("Connecting to twitch...");
         this.chat.connect({
-            channel: this.channel,
+            channel: this.channel.name,
             identity: connectionOptions
         });
-        this.logger.log("Connected! Channel: #" + this.channel);
+        this.logger.log("Connected! Channel: #" + this.channel.name);
         
         // enable input from the console now
         Console.input.enable();
@@ -253,27 +225,36 @@ export class Bot implements ChatHost {
 
 
         this._updateLoop = Timeline.repeat.forever(gettingStreamData.timeout, () => {
-            let { response: { statusCode: code }, body: streamData } = 
-                requestSync("https://" + twitchApiStreamPath + this.channel, { 
+            let { response: { statusCode: code }, body: streamData } = requestSync(
+                "https://" + twitchApiStreamPath + this.channel.name, 
+                { 
                     json: true,
                     headers: {
                         "Client-ID": "lwcc6qlehnacfjysb2jpkfl2to5pase"
                     }
-                });
+                }
+            );
 
+            let output = this.options.output;
             if (code == 200) {
                 if (streamData.stream) {
                     streamData = streamData.stream;
-                    if (!this._isLive) {
-                        this._isLive = true;
-                        this._streamCreated = new Date(streamData.created_at);
+                    if (!this.channel.live) {
+                        this.channel.live = true;
+                        this.channel.stream.start = new Date(streamData.created_at);
+                        this.logger.log(output.channel.wentLive.weave(this.channel.name));
                     }
                 } else {
-                    this._isLive = false;
+                    if (this.channel.stream === undefined) 
+                        this.logger.log(output.channel.notLive.weave(this.channel.name));
+                    this.channel.live = false;
                 }
             } else {
-                if (gettingStreamData.logErrors) console.log("Unable to load stream data.");
+                if (gettingStreamData.logErrors) 
+                    this.logger.logTo("err", output.bot.twitchApiFailure.weave());
             }
+
+            this.plugins.onUpdate();
         });
     }
 }

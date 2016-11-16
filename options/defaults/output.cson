@@ -22,13 +22,12 @@ messages:
         format: "{@user:{action?:~: }}{message}"
     commandCalls:
         commandCalls: "{#grey.bold:{user?{user.displayName}: }{message}}"
-    show:
-        twitchApiFailure: true
 
 bot:
+    twitchApiFailure: "{#red.dim:Unable to load stream data.}"
+
     stop: "{0} has left the chat."
     restart: "{0} is restarting."
-    notLive: "{0} is not live!"
     time: "{0} has been streaming for {1} hours and {2} minutes."
 
     users:
@@ -36,6 +35,11 @@ bot:
         list: "{0..?Chatters~: {0*, }:There are no users in the chat!}"
         join: "{#cyan.bold:{displayName} has joined!}"
         part: "{#grey:{displayName} has left.}"
+
+channel:
+    wentLive: "{0} went live!"
+    isLive: "{0} is live!"
+    notLive: "{0} is not live!"
 
 list:
     size:
@@ -46,6 +50,8 @@ fail:
     default: "Sorry, {0.displayName}, there was an unknown error."
 
 commands:
+    failure: "whisper"
+
     time:
         normal: "{2?You have:{0.displayName} has} {0.time} minutes logged{2?, {0.displayName}}!"
         blacklisted: "{1?Your:{2?My own:{0.displayName}'s}} amount of time logged exceeds the limits of my computational power{1?, {0.displayName}}."
@@ -57,10 +63,3 @@ commands:
         success: "Successfully changed {0.displayName}'s rank to {1}"
 
     whois: "{0.name}{1? [{1}]}: {2}"
-
-
-raffle:
-    winner: "{0}, winner is you!"
-    noWinner: "There was no valid users found for the raffle."
-
-
