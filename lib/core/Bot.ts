@@ -4,8 +4,6 @@ import weaving = require("weaving");
 import { Console, Process, Timeline } from "consolemate";
 import { Database, Collection } from "typego";
 
-import { request, requestSync, http } from "../util/requestSync";
-
 // init modules
 Console.init();
 Console.input.advanced(true);
@@ -30,11 +28,6 @@ import Options = require("./support/Options");
 
 // configuration
 let databaseVersion = "1";
-let gettingStreamData = {
-    timeout: 60,
-    logErrors: true
-};
-let twitchApiStreamPath = "api.twitch.tv/kraken/streams/";
 
 // the bot!
 export class Bot {
@@ -48,21 +41,21 @@ export class Bot {
     plugins: PluginManager;
 
     _updateLoop: Timeline.LoopHandle;
-    
-    channel: Channel = { name: undefined, live: false, status: "", stream: undefined, language: undefined };
+
+    channel: Channel;
 
     get isLive () { return this.channel.live; }
     get uptime () { return Date.now() - this.channel.stream.start.getTime(); }
 
     constructor (public options: Options) {
-        this.channel.name = options.twitch.channel;
-        this.identity = options.twitch.identity;
-
         this.logger = new Logger("logs");
 
         this.logger.selected = "bot.log";
         this.logger.timestamp = true;
         this.logger.timestampFormat = this.options.output.timestamp;
+
+        this.channel = new Channel(options.twitch.channel, this.logger, options);
+        this.identity = options.twitch.identity;
     }
 
     say (...what: any[]) {
@@ -144,12 +137,17 @@ export class Bot {
                     this.say("wow");
                 }
             },
+            status: {
+                call: (caller: Chatter) => {
+                    this.chat.reply(caller, this.channel.status);
+                }
+            },
             uptime: {
-                call: (api: PluginAPI, caller: Chatter) => {
+                call: (caller: Chatter) => {
                     if (this.channel.live) {
-                        api.reply(caller, this.channel.name + " has been live for " + this.uptime);
+                        this.chat.reply(caller, this.channel.name + " has been live for " + this.uptime);
                     } else {
-                        api.reply(caller, this.channel.name + " is not live!");
+                        this.chat.reply(caller, this.channel.name + " is not live!");
                     }
                 }
             },
@@ -224,36 +222,8 @@ export class Bot {
         }
 
 
-        this._updateLoop = Timeline.repeat.forever(gettingStreamData.timeout, () => {
-            let { response: { statusCode: code }, body: streamData } = requestSync(
-                "https://" + twitchApiStreamPath + this.channel.name, 
-                { 
-                    json: true,
-                    headers: {
-                        "Client-ID": "lwcc6qlehnacfjysb2jpkfl2to5pase"
-                    }
-                }
-            );
-
-            let output = this.options.output;
-            if (code == 200) {
-                if (streamData.stream) {
-                    streamData = streamData.stream;
-                    if (!this.channel.live) {
-                        this.channel.live = true;
-                        this.channel.stream.start = new Date(streamData.created_at);
-                        this.logger.log(output.channel.wentLive.weave(this.channel.name));
-                    }
-                } else {
-                    if (this.channel.stream === undefined) 
-                        this.logger.log(output.channel.notLive.weave(this.channel.name));
-                    this.channel.live = false;
-                }
-            } else {
-                if (gettingStreamData.logErrors) 
-                    this.logger.logTo("err", output.bot.twitchApiFailure.weave());
-            }
-
+        this._updateLoop = Timeline.repeat.forever(60, () => {
+            this.channel.update();
             this.plugins.onUpdate();
         });
     }

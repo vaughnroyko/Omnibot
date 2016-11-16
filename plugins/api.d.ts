@@ -55,11 +55,63 @@ declare module api {
         export function get (which: string | number): Ranks;
     }
 
+    
+    export interface Channel {
+        name: string;
+        live: boolean;
+        status: string;
+        language: string;
+        stream: Stream;
+    }
+    export interface Stream {
+        start: Date;
+        viewers: string;
+        game: string;
+    }
+    export interface OfflineChannel extends Channel {
+        live: false;
+        stream: undefined;
+    }
+    export interface LiveChannel extends Channel {
+        live: true;
+        stream: Stream;
+    }
+
+    export interface Options {
+        core: {},
+        mongo: {
+            path: string;
+        },
+        output: {
+            timestamp: string;
+            commands: {
+                failure: "whisper" | "global";
+            },
+            bot: {
+                twitchApiFailure: string;
+            },
+            channel: {
+                wentLive: string;
+                isLive: string;
+                notLive: string;
+            }
+        },
+        plugins: {},
+        keywords: {},
+        twitch: {
+            channel: string,
+            identity: string
+        }
+    }
+
     export interface API {
-        reply (to: Chatter, ...what: any[]): void;
+        say (...what: any[]): void;
+        whisper (to: string, ...what: any[]): void;
+        reply (...what: any[]): void;
         chat: Chat;
         database: Database;
-        isLive: boolean;
+        channel: Channel,
+        options: Options;
     }
     
     // commands
@@ -86,12 +138,15 @@ declare module api {
         commands: CommandLibrary;
         constructor(name: string);
 
+        //// TODO more api support
         onInit (api: API): void;
-        //onClosing (): void;
+        //onClosing (): void {}
         onUnknownCommand (api: API, commandName: string): Command | CommandLibrary;
-        onNewChatter (api: API, chatter: Chatter): void;
-        //onCommandFailed (): void;
-        //onChat (user: Chatter, message: string, whisper?: boolean): void;
+        onChatterJoin (api: API, chatter: Chatter, isNew: boolean): void;
+        onChatterPart (api: API, chatter: Chatter, isNew: boolean): void;
+        onUpdate (api: API): void;
+        //onCommandFailed (): void {}
+        //onChat (user: Chatter, message: string, whisper = false): void {}
 
         [key: string]: any;
     }

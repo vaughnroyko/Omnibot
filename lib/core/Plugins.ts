@@ -87,12 +87,12 @@ export abstract class Plugin {
     constructor (public name: string) {}
 
     //// TODO more api support
-    onInit?: (api: PluginAPI) => void;
+    onInit (api: PluginAPI): void {}
     //onClosing (): void {}
-    onUnknownCommand?: (api: PluginAPI, commandName: string) => Command | Library;
-    onChatterJoin?: (api: PluginAPI, chatter: Chatter, isNew: boolean) => void;
-    onChatterPart?: (api: PluginAPI, chatter: Chatter, isNew: boolean) => void;
-    onUpdate?: (api: PluginAPI) => void;
+    onUnknownCommand (api: PluginAPI, commandName: string): Command | Library { return; }
+    onChatterJoin (api: PluginAPI, chatter: Chatter, isNew: boolean): void {}
+    onChatterPart (api: PluginAPI, chatter: Chatter, isNew: boolean): void {}
+    onUpdate (api: PluginAPI): void {}
     //onCommandFailed (): void {}
     //onChat (user: Chatter, message: string, whisper = false): void {}
 }
@@ -107,9 +107,9 @@ export class PluginManager {
             say: chat.say.bind(chat),
             whisper: chat.whisper.bind(chat),
             reply: chat.reply.bind(chat),
-            chat: chat,
-            database: database
-        } as any;
+            chat, database,
+            channel, options
+        };
         Object.defineProperty(this.api, "isLive", () => channel.live);
 
         // send events to plugins

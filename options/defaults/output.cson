@@ -37,8 +37,9 @@ bot:
         part: "{#grey:{displayName} has left.}"
 
 channel:
-    wentLive: "{0} went live!"
-    isLive: "{0} is live!"
+    wentLive: "{0} went live! Status: {1}"
+    wentOffline: "{0} went offline..."
+    isLive: "{0} is live! Status: {1}"
     notLive: "{0} is not live!"
 
 list:

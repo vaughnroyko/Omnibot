@@ -16,6 +16,7 @@ interface Options {
         },
         channel: {
             wentLive: string;
+            wentOffline: string;
             isLive: string;
             notLive: string;
         }
