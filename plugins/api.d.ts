@@ -121,12 +121,13 @@ declare module api {
     }
     export interface Argument {
         name: string;
-        type?: string;
+        type?: ArgumentType;
     }
+    export type ArgumentType = "string" | "number" | "integer" | "boolean" | "string?" | "number?" | "integer?" | "boolean?";
     export interface Command {
         rank?: Ranks | RankMatcher;
         args?: Argument[];
-        call(api: API, ...args: any[]): void;
+        call(...args: any[]): void;
     }
     export interface CommandLibrary {
         [key: string]: Command | CommandLibrary;
@@ -136,15 +137,16 @@ declare module api {
     export abstract class Plugin {
         name: string;
         commands: CommandLibrary;
-        constructor(name: string);
+        protected api: API;
+        constructor(name: string, api: API);
 
         //// TODO more api support
-        onInit (api: API): void;
+        onInit (): void;
         //onClosing (): void {}
-        onUnknownCommand (api: API, commandName: string): Command | CommandLibrary;
-        onChatterJoin (api: API, chatter: Chatter, isNew: boolean): void;
-        onChatterPart (api: API, chatter: Chatter, isNew: boolean): void;
-        onUpdate (api: API): void;
+        onUnknownCommand (commandName: string): Command | CommandLibrary;
+        onChatterJoin (chatter: Chatter, isNew: boolean): void;
+        onChatterPart (chatter: Chatter, isNew: boolean): void;
+        onUpdate (): void;
         //onCommandFailed (): void {}
         //onChat (user: Chatter, message: string, whisper = false): void {}
 

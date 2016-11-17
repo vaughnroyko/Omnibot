@@ -23,7 +23,7 @@
         "season": "*",
         
         "synchronicity": "0.0.4",
-        "weaving": "0.5.2",
+        "weaving": "0.6.0",
         "weaving-chalk": "*"
     },
     "main": "out/main.js"

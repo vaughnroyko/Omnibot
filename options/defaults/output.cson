@@ -1,8 +1,3 @@
-event:
-    join: ''
-    leave: 'grey'
-    command: ''
-
 user: 'white.dim'
 moderator: '#user'
 broadcaster: '#user'
@@ -10,20 +5,22 @@ greeting: 'magenta.bold.underline'
 farewell: '#greeting'
 keyword: 'yellow.bold.underline'
 
-#console:
-#    info: 'grey'
-#    error: 'red.bold'
-#    data: 'cyan.bold'
-
 timestamp: "{#grey.bold:{hour}:{minute}:{second}}"
 
 messages:
-    normal:
-        format: "{@user:{action?:~: }}{message}"
-    commandCalls:
-        commandCalls: "{#grey.bold:{user?{user.displayName}: }{message}}"
+    normal: "{user.displayName}{isAction!?~:} {message}"
+    commandCall: "{#grey.bold:{user.displayName} {message}}"
+    whisper:
+        sent: "-> {user.displayName}: {message}"
+        recieved: "<- {user.displayName}: {message}"
+        commandCall: "{#grey:<- {user.displayName} {message}}"
+    console:
+        commandCall: "{#grey:{message}}"
+        response: "{#grey:-> {message}}"
 
 bot:
+    connecting: "{#grey:Connecting to twitch...}"
+    connected: "{#grey:Connected! Channel: \#{#yellow.dim:{channel}}}"
     twitchApiFailure: "{#red.dim:Unable to load stream data.}"
 
     stop: "{0} has left the chat."
@@ -52,6 +49,10 @@ fail:
 
 commands:
     failure: "whisper"
+
+    uptime:
+        isLive: "{channel} has been live for {hours} hours and {minutes} minutes."
+        notLive: "{channel} is not live."
 
     time:
         normal: "{2?You have:{0.displayName} has} {0.time} minutes logged{2?, {0.displayName}}!"

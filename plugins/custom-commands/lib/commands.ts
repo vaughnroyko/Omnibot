@@ -29,13 +29,16 @@ export class CustomCommand extends Document {
 }
 
 export class CustomCommands extends Plugin {
-    constructor () { super("custom-commands"); }
+    
+    constructor (api: API) {
+        super("custom-commands", api);
+    }
 
     collection: Collection<CustomCommand>;
     loadedCommands: { [key: string]: CustomCommand } = {};
 
-    onInit (api: API) {
-        this.collection = api.database.collection<CustomCommand>("customCommands", {
+    onInit () {
+        this.collection = this.api.database.collection<CustomCommand>("customCommands", {
             name: { type: String, unique: true },
             content: String,
             rank: { type: Number, default: Ranks["new"] },
@@ -44,7 +47,7 @@ export class CustomCommands extends Plugin {
             stat_failsToDate: { type: Number, default: 0 }
         });
     }
-    onUnknownCommand (api: API, name: string): Command | CommandLibrary {
+    onUnknownCommand (name: string): Command | CommandLibrary {
         let customCommand = name in this.loadedCommands ? 
             this.loadedCommands[name] : this.collection.where({ name: name }).findOne();
         if (!customCommand) return;
@@ -60,17 +63,17 @@ export class CustomCommands extends Plugin {
                     { name: "commandContent", type: "...string" }
                 ],
                 rank: { min: Ranks.mod },
-                call: (api: API, caller: Chatter, name: string, content: string[]) => {
+                call: (caller: Chatter, name: string, content: string[]) => {
                     // add a new command
                     try {
                         this.collection.insert({
                             name: name,
                             content: content.join(" ")
                         });
-                        api.reply(caller, "Successfully added command '" + name + "'");
+                        this.api.reply(caller, "Successfully added command '" + name + "'");
                     } catch (err) {
                         if (err.name == "UniquePropertyError") {
-                            api.reply(caller, "There is already a command with the name '" + name + "'");
+                            this.api.reply(caller, "There is already a command with the name '" + name + "'");
                         } else throw err;
                     }
                 }
@@ -81,13 +84,13 @@ export class CustomCommands extends Plugin {
                     { name: "commandContent", type: "...string" }
                 ],
                 rank: { min: Ranks.mod },
-                call: (api: API, caller: Chatter, name: string, content: string[]) => {
+                call: (caller: Chatter, name: string, content: string[]) => {
                     // edit the message of a command
                     let command = this.collection.where({ name: name }).findOne();
-                    if (!command) return api.reply(caller, "There is no command by the name '" + name + "'");
+                    if (!command) return this.api.reply(caller, "There is no command by the name '" + name + "'");
                     command.content = content.join(" ");
                     command.save();
-                    api.reply(caller, "Successfully edited command '" + name + "'");
+                    this.api.reply(caller, "Successfully edited command '" + name + "'");
                 }
             },
             remove: {
@@ -95,13 +98,13 @@ export class CustomCommands extends Plugin {
                     { name: "commandName", type: "string" }
                 ],
                 rank: { min: Ranks.mod },
-                call: (api: API, caller: Chatter, name: string) => {
+                call: (caller: Chatter, name: string) => {
                     // remove a command
                     let command = this.collection.where({ name: name }).findOne();
-                    if (!command) return api.reply(caller, "There is no command by the name '" + name + "'");
+                    if (!command) return this.api.reply(caller, "There is no command by the name '" + name + "'");
 
                     command.delete();
-                    api.reply(caller, "Successfully removed the command '" + name + "'");
+                    this.api.reply(caller, "Successfully removed the command '" + name + "'");
                 }
             },
             rename: {
@@ -110,18 +113,18 @@ export class CustomCommands extends Plugin {
                     { name: "newName", type: "string" }
                 ],
                 rank: { min: Ranks.mod },
-                call: (api: API, caller: Chatter, oldName: string, newName: string) => {
+                call: (caller: Chatter, oldName: string, newName: string) => {
                     // rename a command
                     let command = this.collection.where({ name: oldName }).findOne();
-                    if (!command) return api.reply(caller, "There is no command by the name '" + name + "'");
+                    if (!command) return this.api.reply(caller, "There is no command by the name '" + oldName + "'");
 
                     command.name = newName;
                     try {
                         command.save();
-                        api.reply(caller, "Successfully renamed the command '" + oldName + "' to '" + newName + "'");
+                        this.api.reply(caller, "Successfully renamed the command '" + oldName + "' to '" + newName + "'");
                     } catch (err) {
                         if (err.name == "UniquePropertyError") {
-                            api.reply(caller, "There is already a command with the name '" + newName + "'");
+                            this.api.reply(caller, "There is already a command with the name '" + newName + "'");
                         } else throw err;
                     }
                 }
@@ -132,14 +135,14 @@ export class CustomCommands extends Plugin {
                     { name: "callerRank", type: "string" }
                 ],
                 rank: { min: Ranks.mod },
-                call: (api: API, caller: Chatter, name: string, rank: string) => {
+                call: (caller: Chatter, name: string, rank: string) => {
                     // change the rank of a custom command
                     let command = this.collection.where({ name: name }).findOne();
-                    if (!command) return api.reply(caller, "There is no command by the name '" + name + "'");
+                    if (!command) return this.api.reply(caller, "There is no command by the name '" + name + "'");
 
                     command.rank = Ranks.get(rank);
                     command.save();
-                    api.reply(caller, "Successfully changed the rank required to run '" + name + "' to '" + Ranks[command.rank] + "'");
+                    this.api.reply(caller, "Successfully changed the rank required to run '" + name + "' to '" + Ranks[command.rank] + "'");
                 }
             }
         }

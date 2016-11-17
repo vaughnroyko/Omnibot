@@ -61,7 +61,7 @@ export class PluginWrapper {
             // it's already a plugin, so do nothing
         } else if (imported.prototype instanceof Plugin) {
             // it's a plugin class, but it still needs to be instanciated
-            this.plugin = new imported;
+            this.plugin = new imported(api);
         } else if (
             "exportName" in data && 
             data.exportName in imported
@@ -70,7 +70,7 @@ export class PluginWrapper {
             if (imported[data.exportName] instanceof Plugin) {
                 this.plugin = imported[data.exportName];
             } else if (imported[data.exportName].prototype instanceof Plugin) {
-                this.plugin = new imported[data.exportName];
+                this.plugin = new (imported[data.exportName])(api);
             } else throw new PluginError(this.name);
         } else throw new PluginError(this.name);
 
@@ -78,21 +78,26 @@ export class PluginWrapper {
             this.commandLibrary = this.plugin.commands;
 
         // api call
-        this.plugin.onInit(this.api);
+        this.plugin.onInit();
     }
 }
 
 export abstract class Plugin {
     commands: Library = {};
-    constructor (public name: string) {}
+    name: string;
+    protected api: PluginAPI;
+    constructor (name: string | PluginAPI, api?: PluginAPI) {
+        if (typeof name == "string") this.name = name, this.api = api;
+        else this.api = name;
+    }
 
     //// TODO more api support
-    onInit (api: PluginAPI): void {}
+    onInit (): void {}
     //onClosing (): void {}
-    onUnknownCommand (api: PluginAPI, commandName: string): Command | Library { return; }
-    onChatterJoin (api: PluginAPI, chatter: Chatter, isNew: boolean): void {}
-    onChatterPart (api: PluginAPI, chatter: Chatter, isNew: boolean): void {}
-    onUpdate (api: PluginAPI): void {}
+    onUnknownCommand (commandName: string): Command | Library { return; }
+    onChatterJoin (chatter: Chatter, isNew: boolean): void {}
+    onChatterPart (chatter: Chatter, isNew: boolean): void {}
+    onUpdate (): void {}
     //onCommandFailed (): void {}
     //onChat (user: Chatter, message: string, whisper = false): void {}
 }
@@ -139,30 +144,30 @@ export class PluginManager {
     // events
     onInit () {
         for (let wrapper of this.plugins) if (wrapper.plugin.onInit) {
-            wrapper.plugin.onInit(this.api);
+            wrapper.plugin.onInit();
         }
     }
     onUnknownCommand (commandName: string): Command | Library {
         for (let wrapper of this.plugins) {
             if (wrapper.plugin.onUnknownCommand) {
-                let result = wrapper.plugin.onUnknownCommand(this.api, commandName);
+                let result = wrapper.plugin.onUnknownCommand(commandName);
                 if (result) return result
             }
         }
     }
     onChatterJoin (chatter: Chatter, isNew: boolean) {
         for (let wrapper of this.plugins) if (wrapper.plugin.onChatterJoin) {
-            wrapper.plugin.onChatterJoin(this.api, chatter, isNew);
+            wrapper.plugin.onChatterJoin(chatter, isNew);
         }
     }
     onChatterPart (chatter: Chatter, isNew: boolean) {
         for (let wrapper of this.plugins) if (wrapper.plugin.onChatterPart) {
-            wrapper.plugin.onChatterPart(this.api, chatter, isNew);
+            wrapper.plugin.onChatterPart(chatter, isNew);
         }
     }
     onUpdate () {
         for (let wrapper of this.plugins) if (wrapper.plugin.onUpdate) {
-            wrapper.plugin.onUpdate(this.api);
+            wrapper.plugin.onUpdate();
         }
     }
 }

@@ -21,7 +21,7 @@ export interface RankMatcher {
 export interface Argument {
     name: string;
     type?: string;
-};
+}
 export interface Command {
     rank?: Rank | RankMatcher;
     args?: Argument[];
@@ -62,9 +62,9 @@ export class Commands {
             let toPush: any;
             if (!consumeRemaining && expected.type.startsWith("...")) 
                 expected = consumeRemaining = { name: expected.name, type: expected.type.slice(3) }, result.push([]);
-                
-            if (expected.type == "number") {
-                toPush = parseFloat(given);
+
+            if (expected.type == "number" || expected.type == "integer") {
+                toPush = expected.type == "number" ? parseFloat(given) : parseInt(given);
                 if (isNaN(toPush)) return new ArgumentsProvidedError(expected, given);
             } else if (expected.type == "user") {
                 toPush = this.chat.getChatter(given);

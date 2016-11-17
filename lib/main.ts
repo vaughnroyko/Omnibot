@@ -18,15 +18,19 @@ Process.on.error("logger", function (err: Error) {
     let success = false;
     try {
         if (typeof bot.logger == "object") {
-            bot.logger.timestamp = false;
-            bot.logger.logTo("error.log", err.stack);
-            success = true;
+            bot.logger.withTimestamp(() => {
+                bot.logger.logTo("error.log", err.stack);
+                success = true;
+            }, false);
         }
     } catch (_e) {}
     if (!success) {
         console.log("Issue using logger.");
         console.log(err.stack);
     }
+    Timeline.after(5, () => {
+        bot.stop();
+    });
     return success;
 });
 

@@ -40,9 +40,16 @@ export class Channel {
                 streamData = streamData.stream;
                 this.status = streamData.channel.status;
                 if (!this.live) {
+                    if (this.live === undefined)
+                        this.logger.log(output.channel.isLive.weave(this.name, this.status));
+                    else
+                        this.logger.log(output.channel.wentLive.weave(this.name, this.status));
+                    this.stream = {
+                        start: new Date(streamData.created_at),
+                        viewers: streamData.viewers,
+                        game: streamData.game
+                    };
                     this.live = true;
-                    this.stream.start = new Date(streamData.created_at);
-                    this.logger.log(output.channel.wentLive.weave(this.name, this.status));
                 }
             } else {
                 if (this.status === undefined) {

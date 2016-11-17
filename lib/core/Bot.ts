@@ -144,10 +144,14 @@ export class Bot {
             },
             uptime: {
                 call: (caller: Chatter) => {
+                    let channel = this.channel.name;
+                    let uptime = output.commands.uptime;
                     if (this.channel.live) {
-                        this.chat.reply(caller, this.channel.name + " has been live for " + this.uptime);
+                        let hours = Math.floor((this.uptime % 86400000) / 3600000);
+                        let minutes = Math.floor(((this.uptime % 86400000) % 3600000) / 60000);
+                        this.chat.reply(caller, uptime.isLive.weave({channel, hours, minutes}));
                     } else {
-                        this.chat.reply(caller, this.channel.name + " is not live!");
+                        this.chat.reply(caller, uptime.notLive.weave({channel}));
                     }
                 }
             },
@@ -178,47 +182,59 @@ export class Bot {
 
         // on chat message, print the message, if it's a command, trigger the commands module
         this.chat.onChatMessage = (user: Chatter, message: string, isAction: boolean) => {
+            let messages = output.messages;
             if (message[0] == "!") {
-                this.logger.log(user.displayName + " " + message);
+                this.logger.log(messages.commandCall.weave({user, message}));
                 this.runCommand(user, message.slice(1));
                 user.stat_commandsToDate++;
             } else {
-                this.logger.log(user.displayName + (isAction ? " " : ": ") + message);
+                this.logger.log(messages.normal.weave({user, message, isAction}));
                 user.stat_messagesToDate++;
             }
             user.save();
         };
         this.chat.onWhisper = (user: Chatter, message: string, isReceived: boolean) => {
+            let whisper = output.messages.whisper;
             if (isReceived && message[0] == "!") {
-                this.logger.log(user.displayName + " " + message);
+                this.logger.log(whisper.commandCall.weave({user, message}));
                 this.runCommand(user, message.slice(1));
                 user.stat_commandsToDate++;
             } else {
-                this.logger.log((isReceived ? "<- " : "-> ") + user.displayName + ": " + message);
+                if (isReceived) {
+                    this.logger.log(whisper.recieved.weave({user, message}));
+                } else {
+                    if (user.name == this.identity) {
+                        this.logger.log(output.messages.console.response.weave({user, message}));
+                    } else {
+                        this.logger.log(whisper.sent.weave({user, message}));
+                    }
+                }
             }
         }
 
+        let output = this.options.output;
         // if we've made it this far, we're ready to connect and start receiving!
-        this.logger.log("Connecting to twitch...");
+        this.logger.log(output.bot.connecting.weave());
         this.chat.connect({
             channel: this.channel.name,
             identity: connectionOptions
         });
-        this.logger.log("Connected! Channel: #" + this.channel.name);
+        this.logger.log(output.bot.connected.weave({channel: this.channel.name}));
         
         // enable input from the console now
         Console.input.enable();
-        Console.onLine = (line: string) => {
-            if (line[0] == "!") {
-                return this.runCommand(this.chat.getChatter(this.identity), line.slice(1));
-            } else if (line[0] == "@") {
-                let match = line.match(/^@([a-zA-Z0-9_]+)/);
+        Console.onLine = (message: string) => {
+            if (message[0] == "!") {
+                this.logger.log(output.messages.console.commandCall.weave({message}));
+                return this.runCommand(this.chat.getChatter(this.identity), message.slice(1));
+            } else if (message[0] == "@") {
+                let match = message.match(/^@([a-zA-Z0-9_]+)/);
                 if (match) {
                     let user = match[1];
-                    return this.whisper(user, line.slice(user.length + 1));
+                    return this.whisper(user, message.slice(user.length + 1));
                 }
             }
-            this.say(line);
+            this.say(message);
         }
 
 
