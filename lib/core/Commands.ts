@@ -1,8 +1,8 @@
 let _ = require("underscore-plus");
 
-import Ranks = require("./support/Ranks");
+import Ranks = require("./interfaces/Ranks");
 import { Chatter, Chat } from "./Chat";
-import { PluginAPI } from "./support/PluginAPI";
+import { PluginAPI } from "./interfaces/PluginAPI";
 
 import weaving = require("weaving");
 

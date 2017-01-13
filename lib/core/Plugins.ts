@@ -7,9 +7,9 @@ import fs = require("../util/fs");
 import { Library, Command, Commands } from "./Commands";
 import { Chat, Chatter } from "./Chat";
 
-import { PluginAPI } from "./support/PluginAPI";
-import { Channel } from "./support/Channel";
-import Options = require("./support/Options");
+import { PluginAPI } from "./interfaces/PluginAPI";
+import { Channel } from "./Channel";
+import { Options } from "./interfaces/Options";
 
 import weaving = require("weaving");
 
@@ -42,37 +42,47 @@ export class PluginWrapper {
     directory: string;
     commandLibrary: Library = {};
     plugin: Plugin;
-    constructor (directory: string, private api: PluginAPI) {
-        this.directory = directory;
-        let data: PluginData;
-        try {
-            data = season.readFileSync(path.join(directory, "plugin.cson"));
-        } catch (err) {
-            throw new InvalidPluginDefinitionFileError();
-        }
-        this.name = data.name || path.basename(directory);
-        let imported: any;
-        try {
-            imported = require(path.join(directory, data.main));
-        } catch (err) {
-            throw new PluginError(this.name, err.message);
-        }
-        if (imported instanceof Plugin) {
-            // it's already a plugin, so do nothing
-        } else if (imported.prototype instanceof Plugin) {
-            // it's a plugin class, but it still needs to be instanciated
-            this.plugin = new imported(api);
-        } else if (
-            "exportName" in data && 
-            data.exportName in imported
-        ) {
-            // using a custom export name (for plugins that export multiple things)
-            if (imported[data.exportName] instanceof Plugin) {
-                this.plugin = imported[data.exportName];
-            } else if (imported[data.exportName].prototype instanceof Plugin) {
-                this.plugin = new (imported[data.exportName])(api);
+    constructor (plugin: Plugin, api: PluginAPI);
+    constructor (directory: string, api: PluginAPI);
+    constructor (directoryOrPlugin: string | Plugin, private api: PluginAPI) {
+        if (typeof directoryOrPlugin == "string") {
+            let directory = this.directory = directoryOrPlugin;
+
+            let data: PluginData;
+            try {
+                data = season.readFileSync(path.join(directory, "plugin.cson"));
+            } catch (err) {
+                throw new InvalidPluginDefinitionFileError();
+            }
+            this.name = data.name || path.basename(directory);
+            if (this.name[0] == "_") throw new PluginError(this.name, "Plugin names cannot begin with an underscore");
+
+            let imported: any;
+            try {
+                imported = require(path.join(directory, data.main));
+            } catch (err) {
+                throw new PluginError(this.name, err.message);
+            }
+            if (imported instanceof Plugin) {
+                // it's already a plugin, so do nothing
+            } else if (imported.prototype instanceof Plugin) {
+                // it's a plugin class, but it still needs to be instanciated
+                this.plugin = new imported(api);
+            } else if (
+                "exportName" in data && 
+                data.exportName in imported
+            ) {
+                // using a custom export name (for plugins that export multiple things)
+                if (imported[data.exportName] instanceof Plugin) {
+                    this.plugin = imported[data.exportName];
+                } else if (imported[data.exportName].prototype instanceof Plugin) {
+                    this.plugin = new (imported[data.exportName])(api);
+                } else throw new PluginError(this.name);
             } else throw new PluginError(this.name);
-        } else throw new PluginError(this.name);
+        } else {
+            this.plugin = directoryOrPlugin;
+            this.name = this.plugin.name;
+        }
 
         if (this.plugin.commands)
             this.commandLibrary = this.plugin.commands;
@@ -124,9 +134,17 @@ export class PluginManager {
 
         directory = path.resolve(directory);
         let dirContents = fs.readdirSync(directory);
-        for (let pluginDir of dirContents) {
+        for (let i = 0; i < dirContents.length; i++) {
+            dirContents[i] = path.join(directory, dirContents[i]);
+        }
+        this.add(...dirContents);
+    }
+    add (...plugins: Plugin[]): void;
+    add (...pluginPaths: string[]): void;
+    add (...plugins: (Plugin | string)[]) {
+        for (let pluginOrDirectory of plugins) {
             try {
-                let plugin = new PluginWrapper(path.join(directory, pluginDir), this.api);
+                let plugin = new PluginWrapper(pluginOrDirectory as any, this.api);
                 if (plugin) this.plugins.push(plugin);
             } catch (err) {
                 if (err instanceof PluginError) {

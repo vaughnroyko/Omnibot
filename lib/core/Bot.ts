@@ -18,13 +18,15 @@ import { Chat, Chatter, UserData } from "./Chat";
 import { Commands } from "./Commands";
 
 import { PluginManager, PluginWrapper as Plugin } from "./Plugins";
-import { PluginAPI } from "./support/PluginAPI";
+import { PluginAPI } from "./interfaces/PluginAPI";
 
-import Ranks = require("./support/Ranks");
+import { Core as CoreCommands } from "./commands/Core";
 
-import { Channel } from "./support/Channel";
+import Ranks = require("./interfaces/Ranks");
 
-import Options = require("./support/Options");
+import { Channel } from "./Channel";
+
+import { Options } from "./interfaces/Options";
 
 // configuration
 let databaseVersion = "1";
@@ -45,7 +47,6 @@ export class Bot {
     channel: Channel;
 
     get isLive () { return this.channel.live; }
-    get uptime () { return Date.now() - this.channel.stream.start.getTime(); }
 
     constructor (public options: Options) {
         this.logger = new Logger("logs");
@@ -111,6 +112,8 @@ export class Bot {
             return;
         }
 
+        let output = this.options.output;
+
 
         // connect to twitch 
         this.chat = new Chat(this.database, () => this.channel.live);
@@ -121,63 +124,22 @@ export class Bot {
             stop: {
                 rank: Ranks.admin,
                 call: () => {
-                    this.say("Shutting down.. Bye guys... ;-;");
+                    this.say(output.bot.stop.weave({botName: this.identity}));
                     this.stop();
                 }
             },
             restart: {
                 rank: Ranks.admin,
                 call: () => {
-                    this.say("brbz");
+                    this.say(output.bot.restart.weave({botName: this.identity}));
                     this.restart();
-                }
-            },
-            noah: {
-                call: () => {
-                    this.say("wow");
-                }
-            },
-            status: {
-                call: (caller: Chatter) => {
-                    this.chat.reply(caller, this.channel.status);
-                }
-            },
-            uptime: {
-                call: (caller: Chatter) => {
-                    let channel = this.channel.name;
-                    let uptime = output.commands.uptime;
-                    if (this.channel.live) {
-                        let hours = Math.floor((this.uptime % 86400000) / 3600000);
-                        let minutes = Math.floor(((this.uptime % 86400000) % 3600000) / 60000);
-                        this.chat.reply(caller, uptime.isLive.weave({channel, hours, minutes}));
-                    } else {
-                        this.chat.reply(caller, uptime.notLive.weave({channel}));
-                    }
-                }
-            },
-            time: {
-                args: [
-                    { 
-                        name: "chatter",
-                        type: "string?"
-                    }
-                ],
-                call: (caller: Chatter, requestedUser: string) => {
-                    let chatter: Chatter;
-                    if (requestedUser) {
-                        chatter = this.chat.findChatter(requestedUser);
-                        if (!chatter) return this.chat.reply(caller, "Are you sure '" + requestedUser + "' has been here before?");
-                    } else chatter = caller;
-
-                    this.chat.reply(caller, 
-                        (requestedUser ? requestedUser + " has " : "You have ") + chatter.stat_time + " minutes logged."
-                    );
                 }
             }
         });
 
         // load all the plugins, add any commands the plugins provide to the command library
         this.plugins = new PluginManager("plugins", this.chat, this.commands, this.database, this.channel, this.options);
+        this.plugins.add(new CoreCommands(this.plugins.api));
         this.plugins.forEach((plugin) => this.commands.add(plugin.commandLibrary));
 
         // on chat message, print the message, if it's a command, trigger the commands module
@@ -210,16 +172,22 @@ export class Bot {
                     }
                 }
             }
-        }
+        };
 
-        let output = this.options.output;
+        this.chat.onChatterJoin = (chatter: Chatter, isNew: boolean) => {
+            this.logger.log(output.chatters.join.weave({chatter}));
+        };
+        this.chat.onChatterPart = (chatter: Chatter) => {
+            this.logger.log(output.chatters.part.weave({chatter}));
+        };
+
         // if we've made it this far, we're ready to connect and start receiving!
-        this.logger.log(output.bot.connecting.weave());
+        this.logger.log(output.bot.connecting.weave({channel: this.channel}));
         this.chat.connect({
             channel: this.channel.name,
             identity: connectionOptions
         });
-        this.logger.log(output.bot.connected.weave({channel: this.channel.name}));
+        this.logger.log(output.bot.connected.weave({channel: this.channel}));
         
         // enable input from the console now
         Console.input.enable();

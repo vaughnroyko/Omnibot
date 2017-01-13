@@ -1,0 +1,26 @@
+{
+	"rules": {
+
+		"prefer-for-of": true,
+		"no-var-keyword": true,
+		"no-duplicate-variable": true,
+		"no-empty": true,
+		"no-invalid-this": true,
+		"no-eval": true,
+		"no-switch-case-fall-through": true,
+
+		"cyclomatic-complexity":[
+			true, 20
+		],
+
+		
+		"class-name": true,
+		"semicolon": ["always"],
+		"no-trailing-whitespace": true,
+		"array-type":[ true, "array" ],
+		"comment-format": [ true, "check-space", "check-lowercase" ],
+		//"completed-docs": [true, "classes", "methods", "properties"],
+		"quotemark": [true, "double", "avoid-escape"],
+		"whitespace": [true, "check-branch", "check-operator", "check-type", "check-separator", "check-module", "check-decl"]
+	}
+}

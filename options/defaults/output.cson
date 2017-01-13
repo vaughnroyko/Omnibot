@@ -20,24 +20,24 @@ messages:
 
 bot:
     connecting: "{#grey:Connecting to twitch...}"
-    connected: "{#grey:Connected! Channel: \#{#yellow.dim:{channel}}}"
+    connected: "{#grey:Connected! Channel: \#{#yellow.dim:{channel.name}}}"
     twitchApiFailure: "{#red.dim:Unable to load stream data.}"
 
-    stop: "{0} has left the chat."
-    restart: "{0} is restarting."
-    time: "{0} has been streaming for {1} hours and {2} minutes."
+    stop: "I have left the chat."
+    restart: "I am restarting..."
+    back: "I have returned."
 
-    users:
-        rankUp: "{displayName} is now a trusted user!"
-        list: "{0..?Chatters~: {0*, }:There are no users in the chat!}"
-        join: "{#cyan.bold:{displayName} has joined!}"
-        part: "{#grey:{displayName} has left.}"
+chatters:
+    rankUp: "{chatter.displayName} is now a trusted chatter!"
+    list: "{0..?Chatters~: {0*, }:There are no chatters in the chat!}"
+    join: "{#cyan.bold:{displayName} has joined!}"
+    part: "{#grey:{displayName} has left.}"
 
 channel:
-    wentLive: "{0} went live! Status: {1}"
-    wentOffline: "{0} went offline..."
-    isLive: "{0} is live! Status: {1}"
-    notLive: "{0} is not live!"
+    wentLive: "{channel.name} went live! Status: {channel.status}"
+    wentOffline: "{channel.name} went offline..."
+    isLive: "{channel.name} is live! Status: {channel.status}"
+    notLive: "{channel.name} is not live!"
 
 list:
     size:
@@ -45,23 +45,24 @@ list:
         max: 10
 
 fail:
-    default: "Sorry, {0.displayName}, there was an unknown error."
+    default: "Sorry, {displayName}, there was an unknown error."
 
 commands:
     failure: "whisper"
 
     uptime:
-        isLive: "{channel} has been live for {hours} hours and {minutes} minutes."
-        notLive: "{channel} is not live."
+        isLive: "{channel.name} has been live for {hours} hours and {minutes} minutes."
+        notLive: "{channel.name} is not live."
 
     time:
-        normal: "{2?You have:{0.displayName} has} {0.time} minutes logged{2?, {0.displayName}}!"
-        blacklisted: "{1?Your:{2?My own:{0.displayName}'s}} amount of time logged exceeds the limits of my computational power{1?, {0.displayName}}."
-        unknown: "It seems {1?you're:'{0.displayName}' is} not in my database yet{1?, {0.displayName}}."
+        normal: "{chatter?You have {caller.time}:{chatter.displayName} has {chatter.time}} minutes logged{chatter!?, {caller.displayName}}!"
+        blacklisted: "{1?Your:{2?My own:{displayName}'s}} amount of time logged exceeds the limits of my computational power{1?, {displayName}}."
+        unknown: "It seems {1?you're:'{displayName}' is} not in my database yet{1?, {displayName}}."
 
     rank:
         notExist: "There's no user by the name '{0}'"
         invalid: "'{0}' is not a valid rank"
-        success: "Successfully changed {0.displayName}'s rank to {1}"
+        success: "Successfully changed {displayName}'s rank to {1}"
 
     whois: "{0.name}{1? [{1}]}: {2}"
+    status: "{channel.status}"

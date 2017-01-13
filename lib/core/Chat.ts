@@ -4,7 +4,8 @@ let whisperReplies = true;
 import { Database, Collection, Schema, Document } from "typego";
 import { Timeline } from "consolemate";
 
-import Ranks = require("./support/Ranks");
+import Ranks = require("./interfaces/Ranks");
+import { IChatter } from "./interfaces/IChatter";
 
 import { Client, ClientOptions } from "./Client";
 export { ClientOptions };
@@ -177,7 +178,7 @@ export class Chat {
     onWhisper: (user: Chatter, message: string, isReceived: boolean) => void;
 }
 
-export class Chatter extends Document {
+export class Chatter extends Document implements IChatter {
     public name: string;
     public rank: number;
     public displayName: string;

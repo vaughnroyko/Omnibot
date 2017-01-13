@@ -10,7 +10,7 @@ export class Logger {
 
     selected: string;
     timestamp: boolean;
-    timestampFormat: string;
+    timestampFormat: any;
 
     constructor (public folder: string) {
         folder = path.resolve(process.cwd(), folder);

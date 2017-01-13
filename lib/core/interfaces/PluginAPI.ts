@@ -1,6 +1,6 @@
 import { Chat } from "../Chat";
-import { Channel } from "./Channel";
-import Options = require("./Options");
+import { IChannel } from "./IChannel";
+import { Options } from "./Options";
 
 import { Database } from "typego";
 
@@ -10,7 +10,7 @@ export interface PluginAPI {
     reply (...what: any[]): void;
     chat: Chat;
     database: Database;
-    channel: Channel,
+    channel: IChannel,
     options: Options;
 }
 export interface CallbackHost {
