@@ -1,5 +1,0 @@
-This is the test suite for Omnibot's code. To run it, install jasmine-node
-I'm using jasmine-node using the latest version on the master branch 1.14.3 (Jasmine 1.3 or something)
-I can't gaurantee it will work with the beta2.0 branch
-
-When you're ready to test use develop.bat

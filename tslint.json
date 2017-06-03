@@ -1,26 +1,42 @@
 {
 	"rules": {
-
-		"prefer-for-of": true,
-		"no-var-keyword": true,
-		"no-duplicate-variable": true,
-		"no-empty": true,
-		"no-invalid-this": true,
-		"no-eval": true,
-		"no-switch-case-fall-through": true,
-
-		"cyclomatic-complexity":[
-			true, 20
+		"prefer-const": true,
+		"arrow-parens": false,
+		"quotemark": [
+			true,
+			"double"
 		],
-
-		
-		"class-name": true,
-		"semicolon": ["always"],
+		"semicolon": [
+			true
+		],
+		"no-shadowed-variable": true,
+		"indent": [
+			true,
+			"tabs"
+		],
 		"no-trailing-whitespace": true,
-		"array-type":[ true, "array" ],
-		"comment-format": [ true, "check-space", "check-lowercase" ],
-		//"completed-docs": [true, "classes", "methods", "properties"],
-		"quotemark": [true, "double", "avoid-escape"],
-		"whitespace": [true, "check-branch", "check-operator", "check-type", "check-separator", "check-module", "check-decl"]
+		"no-var-keyword": true,
+		"prefer-for-of": true,
+		"object-literal-shorthand": true,
+		"whitespace": [
+			true,
+			"check-branch",
+			"check-decl",
+			"check-operator",
+			"check-module",
+			"check-separator",
+			"check-type"
+		],
+		"array-type": [
+			true,
+			"array"
+		],
+		"trailing-comma": [
+			true,
+			{
+				"multiline": "always", 
+				"singleline": "never"
+			}
+		]
 	}
 }

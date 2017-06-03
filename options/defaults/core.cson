@@ -11,5 +11,5 @@ keywords: []
 # the time it takes for a user to be able to use more advanced bot commands (like quote and such)
 userTrustTime: 120
 
-# users that don't appear on the bot
+# users that don't appear on the bot. Always contains the bot itself and the streamer
 blacklist: []

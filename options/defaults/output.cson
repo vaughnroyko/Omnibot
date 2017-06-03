@@ -5,22 +5,22 @@ greeting: 'magenta.bold.underline'
 farewell: '#greeting'
 keyword: 'yellow.bold.underline'
 
-timestamp: "{#grey.bold:{hour}:{minute}:{second}}"
+timestamp: "{#gray.bold:{hour}:{minute}:{second}}"
 
 messages:
     normal: "{user.displayName}{isAction!?~:} {message}"
-    commandCall: "{#grey.bold:{user.displayName} {message}}"
+    commandCall: "{#gray.bold:{user.displayName} {message}}"
     whisper:
         sent: "-> {user.displayName}: {message}"
         recieved: "<- {user.displayName}: {message}"
-        commandCall: "{#grey:<- {user.displayName} {message}}"
+        commandCall: "{#gray:<- {user.displayName} {message}}"
     console:
-        commandCall: "{#grey:{message}}"
-        response: "{#grey:-> {message}}"
+        commandCall: "{#gray:{message}}"
+        response: "{#gray:-> {message}}"
 
 bot:
-    connecting: "{#grey:Connecting to twitch...}"
-    connected: "{#grey:Connected! Channel: \#{#yellow.dim:{channel.name}}}"
+    connecting: "{#gray:Connecting to twitch...}"
+    connected: "{#gray:Connected! Channel: \#{#yellow.dim:{channel.name}}}"
     twitchApiFailure: "{#red.dim:Unable to load stream data.}"
 
     stop: "I have left the chat."
@@ -31,7 +31,7 @@ chatters:
     rankUp: "{chatter.displayName} is now a trusted chatter!"
     list: "{0..?Chatters~: {0*, }:There are no chatters in the chat!}"
     join: "{#cyan.bold:{displayName} has joined!}"
-    part: "{#grey:{displayName} has left.}"
+    part: "{#gray:{displayName} has left.}"
 
 channel:
     wentLive: "{channel.name} went live! Status: {channel.status}"
@@ -56,7 +56,7 @@ commands:
 
     time:
         normal: "{chatter?You have {caller.time}:{chatter.displayName} has {chatter.time}} minutes logged{chatter!?, {caller.displayName}}!"
-        blacklisted: "{1?Your:{2?My own:{displayName}'s}} amount of time logged exceeds the limits of my computational power{1?, {displayName}}."
+        blacklisted: "{1?Your:{2?My own:{displayName}'s}} time is not tracked{1?, {displayName}}."
         unknown: "It seems {1?you're:'{displayName}' is} not in my database yet{1?, {displayName}}."
 
     rank:
