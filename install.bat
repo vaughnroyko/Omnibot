@@ -15,6 +15,7 @@ mkdir database > nul 2> nul
 setlocal
 :askMongoFolder
 set /p loc="Please enter the path of MongoDB's executable containing folder: "
+REM TODO do this without assuming version--else this will have to be updated every version of mongodb
 if "%loc%"=="" set loc=C:/Program Files/MongoDB/Server/3.4/bin
 if NOT "%loc:~-1%" == "/" set loc=%loc%/
 if NOT exist "%loc%mongo.exe" goto askMongoFolder
